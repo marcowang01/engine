@@ -85,9 +85,7 @@ export default function Page() {
                   <span>Code</span>
                 </div>
               </div>
-              <div id="editor-parent" ref={editorParentRef}>
-                <div id="editor" />
-              </div>
+              <div id="editor-parent" ref={editorParentRef} className="h-full" />
             </div>
           </ResizablePanel>
           <ResizableHandle className="bg-blue-400 p-1 opacity-0 transition-opacity hover:opacity-100 active:opacity-100" />

@@ -84,7 +84,11 @@ function createEditorState(initialContent: string, options: EditorOptions = {}) 
 }
 
 function createEditorView(state: EditorState, parent: HTMLElement | null) {
-  return new EditorView({ state, parent: parent || undefined })
+  const view = new EditorView({ state, parent: parent || undefined })
+  // make the editor grow to fill the parent
+  view.dom.style.height = "100%"
+
+  return view
 }
 
 declare global {
