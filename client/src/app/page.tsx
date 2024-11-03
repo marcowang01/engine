@@ -23,46 +23,38 @@ export default function Page() {
       return
     }
 
-    switch (consoleInput) {
-      case "clear": {
-        setConsoleOutput([])
-        setConsoleInput("")
-        return
-      }
+    handleConsoleCommands(consoleInput)
+  }
 
-      case "run": {
-        const currentCode = editorView?.state.doc.toString()
-
-        const response = await fetch(`${SERVER_URL}/execute-code`, {
-          method: "POST",
-          body: JSON.stringify({ code: currentCode, language: "python" }),
-        })
-
-        if (!response.ok) {
-          setConsoleOutput([
-            ...consoleOutput,
-            `> ${consoleInput}`,
-            `${consoleInput} command not found`,
-          ])
-          return
-        }
-
-        const data = await response.json()
-        setConsoleOutput([...consoleOutput, `> ${consoleInput}`, data.output])
-        setConsoleInput("")
-        return
-      }
-
-      default: {
-        setConsoleOutput([
-          ...consoleOutput,
-          `> ${consoleInput}`,
-          `${consoleInput} command not found`,
-        ])
-        setConsoleInput("")
-        return
-      }
+  async function handleConsoleCommands(command: string) {
+    if (command === "clear") {
+      setConsoleOutput([])
+      setConsoleInput("")
+      return
     }
+
+    if (command === "run") {
+      const currentCode = editorView?.state.doc.toString()
+
+      const response = await fetch(`${SERVER_URL}/execute-code`, {
+        method: "POST",
+        body: JSON.stringify({ code: currentCode, language: "python" }),
+      })
+
+      if (!response.ok) {
+        setConsoleOutput([...consoleOutput, `> ${command}`, `${command} command not found`])
+        return
+      }
+
+      const data = await response.json()
+      setConsoleOutput([...consoleOutput, `> ${command}`, data.output])
+      setConsoleInput("")
+      return
+    }
+
+    setConsoleOutput([...consoleOutput, `> ${command}`, `${command} command not found`])
+    setConsoleInput("")
+    return
   }
 
   const handleOnScriptLoad = () => {
