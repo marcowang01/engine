@@ -1,6 +1,5 @@
 {
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll": "always",
     "source.organizeImports": "always"
@@ -32,5 +31,7 @@
       "source.organizeImports": "always"
     }
   },
+  "go.lintOnSave": "file",
+  "go.formatTool": "gofmt",
   "npm.packageManager": "pnpm"
 }
