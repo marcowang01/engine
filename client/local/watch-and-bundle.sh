@@ -15,7 +15,7 @@ cd $SCRIPT_PATH/../
 # -- sh: runs the command in a shell
 # -c: command to run
 
-reflex -g src/editor/editor.js -- sh -c \
+reflex -g src/editor/editor.ts -- sh -c \
   "pnpm rollup -c && \
   cd public && \
   npx terser editor.bundle.js -o editor.bundle.min.js && \

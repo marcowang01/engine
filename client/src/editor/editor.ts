@@ -15,7 +15,11 @@ import { oneDark } from "@codemirror/theme-one-dark"
 // Language
 import { python } from "@codemirror/lang-python"
 
-function createEditorState(initialContent, options = {}) {
+export interface EditorOptions {
+  oneDark?: boolean
+}
+
+function createEditorState(initialContent: string, options: EditorOptions = {}) {
   let extensions = [
     lineNumbers(),
     highlightSpecialChars(),
@@ -36,11 +40,13 @@ function createEditorState(initialContent, options = {}) {
   })
 }
 
-function createEditorView(state, parent) {
-  return new EditorView({ state, parent })
+function createEditorView(state: EditorState, parent: HTMLElement | null) {
+  return new EditorView({ state, parent: parent || undefined })
 }
 
 const initialState = createEditorState("print('Hello, world!')\n", { oneDark: true })
-const editorView = createEditorView(initialState, document.getElementById("editor-parent"))
+
+const editorParent = document.getElementById("editor-parent")
+const editorView = createEditorView(initialState, editorParent)
 
 export default editorView

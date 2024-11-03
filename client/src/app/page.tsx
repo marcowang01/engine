@@ -36,6 +36,16 @@ export default function Page() {
 
   const handleConsoleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (consoleInput === "") {
+      return
+    }
+
+    if (consoleInput === "clear") {
+      setConsoleOutput([])
+      setConsoleInput("")
+      return
+    }
+
     setConsoleOutput([...consoleOutput, `> ${consoleInput}`, "Command executed successfully"])
     setConsoleInput("")
   }
@@ -64,7 +74,7 @@ export default function Page() {
                 {consoleOutput.map((line, index) => (
                   <div key={index}>{line}</div>
                 ))}
-                <form onSubmit={handleConsoleSubmit} className="mt-2 flex">
+                <form onSubmit={handleConsoleSubmit} className="flex">
                   <span className="mr-2">{">"}</span>
                   <input
                     type="text"
