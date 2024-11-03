@@ -20,7 +20,7 @@ export interface EditorOptions {
 }
 
 function createEditorState(initialContent: string, options: EditorOptions = {}) {
-  let extensions = [
+  const extensions = [
     lineNumbers(),
     highlightSpecialChars(),
     drawSelection(),
