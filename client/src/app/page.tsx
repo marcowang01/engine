@@ -13,13 +13,16 @@ const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
 export default function Page() {
   const [consoleInput, setConsoleInput] = useState("")
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
-
   const [editorView, setEditorView] = useState<EditorView | null>(null)
+
   const editorParentRef = useRef<HTMLDivElement>(null)
+  const consoleInputRef = useRef<HTMLInputElement>(null)
 
   const handleConsoleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (consoleInput === "") {
+      setConsoleOutput((prev) => [...prev, "> "])
+      setConsoleInput("")
       return
     }
 
@@ -43,18 +46,18 @@ export default function Page() {
 
       if (!response.ok) {
         const error = await response.text()
-        setConsoleOutput([...consoleOutput, `> ${command}`, error])
+        setConsoleOutput((prev) => [...prev, `> ${command}`, error])
         setConsoleInput("")
         return
       }
 
       const data = await response.json()
-      setConsoleOutput([...consoleOutput, `> ${command}`, data.output])
+      setConsoleOutput((prev) => [...prev, `> ${command}`, data.output])
       setConsoleInput("")
       return
     }
 
-    setConsoleOutput([...consoleOutput, `> ${command}`, `${command} command not found`])
+    setConsoleOutput((prev) => [...prev, `> ${command}`, `sh: command not found: ${command}`])
     setConsoleInput("")
     return
   }
@@ -68,16 +71,32 @@ export default function Page() {
     ) {
       console.log("createEditorState and createEditorView are available")
 
-      const initialPythonProgram = `print("Hello, world!")
+      const initialPythonProgram = `from typing import List
 
 class Solution:
     def twoSum(self, nums: List[int], target: int) -> List[int]:
-        pass
+        return [0, 1]
+
+testCases = [
+    ([2, 7, 11, 15], 9),
+    ([3, 2, 4], 6),
+    ([3, 3], 6),
+]
+
+for nums, target in testCases:
+    if Solution().twoSum(nums, target) == [0, 1]:
+        print("Pass")
+    else:
+        print("Fail")
 `
       const initialState = window.createEditorState(initialPythonProgram, { oneDark: true })
       const editorView = window.createEditorView(initialState, editorParentRef.current)
       setEditorView(editorView)
     }
+  }
+
+  const handleOnConsoleCardClick = () => {
+    consoleInputRef.current?.focus()
   }
 
   return (
@@ -96,11 +115,15 @@ class Solution:
             </div>
           </ResizablePanel>
           <ResizableHandle className="bg-blue-400 p-1 opacity-0 transition-opacity hover:opacity-100 active:opacity-100" />
-          <ResizablePanel defaultSize={40} className="m-4 rounded-xl border border-blue-400">
-            <Card className="m-3 rounded-xl border-t border-gray-800 bg-black text-white">
+          <ResizablePanel
+            defaultSize={40}
+            className="m-4 cursor-text rounded-xl border border-blue-400 bg-black"
+            onClick={handleOnConsoleCardClick}
+          >
+            <Card className="m-3 rounded-xl border-t border-none border-gray-800 bg-black text-white">
               <div className="h-full overflow-auto p-2 font-mono text-sm">
                 {consoleOutput.map((line, index) => (
-                  <div key={index} className="mb-2">
+                  <div key={index} className="mb-1">
                     <pre>{line}</pre>
                   </div>
                 ))}
@@ -108,6 +131,7 @@ class Solution:
                   <span className="mr-2">{">"}</span>
                   <input
                     type="text"
+                    ref={consoleInputRef}
                     value={consoleInput}
                     onChange={(e) => setConsoleInput(e.target.value)}
                     className="flex-1 bg-transparent outline-none"
