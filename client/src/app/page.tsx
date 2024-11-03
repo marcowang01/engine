@@ -12,35 +12,7 @@ const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
 
 export default function Page() {
   const [consoleInput, setConsoleInput] = useState("")
-  const [consoleOutput, setConsoleOutput] = useState<string[]>([
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-    ">",
-  ])
+  const [consoleOutput, setConsoleOutput] = useState<string[]>([])
   const [editorView, setEditorView] = useState<EditorView | null>(null)
 
   const editorParentRef = useRef<HTMLDivElement>(null)
