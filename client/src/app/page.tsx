@@ -93,7 +93,9 @@ export default function Page() {
             <Card className="m-3 rounded-xl border-t border-gray-800 bg-black text-white">
               <div className="h-full overflow-auto p-2 font-mono text-sm">
                 {consoleOutput.map((line, index) => (
-                  <div key={index}>{line}</div>
+                  <div key={index} className="mb-2">
+                    <pre>{line}</pre>
+                  </div>
                 ))}
                 <form onSubmit={handleConsoleSubmit} className="flex">
                   <span className="mr-2">{">"}</span>
