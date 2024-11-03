@@ -6,17 +6,52 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { EditorView } from "codemirror"
 import { Code2, Terminal } from "lucide-react"
 import Script from "next/script"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
 
 export default function Page() {
   const [consoleInput, setConsoleInput] = useState("")
-  const [consoleOutput, setConsoleOutput] = useState<string[]>([])
+  const [consoleOutput, setConsoleOutput] = useState<string[]>([
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+    ">",
+  ])
   const [editorView, setEditorView] = useState<EditorView | null>(null)
 
   const editorParentRef = useRef<HTMLDivElement>(null)
   const consoleInputRef = useRef<HTMLInputElement>(null)
+  const consoleInputParentRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (consoleInputParentRef.current) {
+      consoleInputParentRef.current.scrollTop = consoleInputParentRef.current.scrollHeight
+    }
+  }, [consoleOutput])
 
   const handleConsoleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -105,7 +140,7 @@ for nums, target in testCases:
         <ResizablePanelGroup direction="vertical" className="h-full">
           <ResizablePanel defaultSize={60} className="m-4 rounded-xl border border-blue-400">
             <div className="flex h-full flex-col">
-              <div className="flex items-center border-b border-gray-800 p-2">
+              <div className="flex h-[40px] items-center border-b border-gray-800 pl-2">
                 <div className="flex items-center gap-2">
                   <Code2 className="h-4 w-4" />
                   <span>code</span>
@@ -120,14 +155,17 @@ for nums, target in testCases:
             className="m-4 cursor-text rounded-xl border border-blue-400 bg-black"
             onClick={handleOnConsoleCardClick}
           >
-            <div className="flex items-center border-b border-gray-800 p-2">
+            <div className="flex h-[40px] items-center border-b border-gray-800 pl-2">
               <div className="flex items-center gap-2">
                 <Terminal className="h-4 w-4" />
                 <span>console</span>
               </div>
             </div>
-            <Card className="m-3 rounded-xl border-t border-none border-gray-800 bg-black text-white">
-              <div className="h-full overflow-auto p-2 font-mono text-sm">
+            <Card className="mx-3 mb-3 h-[calc(100%-40px)] rounded-xl border-t border-none border-gray-800 bg-black text-white">
+              <div
+                className="h-full overflow-y-auto p-2 font-mono text-sm"
+                ref={consoleInputParentRef}
+              >
                 {consoleOutput.map((line, index) => (
                   <div key={index} className="mb-1">
                     <pre>{line}</pre>
