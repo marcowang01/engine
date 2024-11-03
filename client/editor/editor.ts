@@ -100,24 +100,3 @@ declare global {
 
 window.createEditorState = createEditorState
 window.createEditorView = createEditorView
-
-/*
-const initialState = createEditorState("print('Hello, world!')\n", { oneDark: true })
-
-const editorParent = document.getElementById("editor-parent")
-const editorView = createEditorView(initialState, editorParent)
-
-export function getCurrentCode() {
-  return editorView.state.doc.toString()
-}
-
-declare global {
-  interface Window {
-    getCurrentCode: () => string
-  }
-}
-
-window.getCurrentCode = getCurrentCode
-
-export default editorView
-*/
