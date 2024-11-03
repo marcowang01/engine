@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 // import MyEditor from "@/components/ui/react-editor"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { EditorView } from "codemirror"
-import { Code2 } from "lucide-react"
+import { Code2, Terminal } from "lucide-react"
 import Script from "next/script"
 import { useRef, useState } from "react"
 
@@ -108,7 +108,7 @@ for nums, target in testCases:
               <div className="flex items-center border-b border-gray-800 p-2">
                 <div className="flex items-center gap-2">
                   <Code2 className="h-4 w-4" />
-                  <span>Code</span>
+                  <span>code</span>
                 </div>
               </div>
               <div id="editor-parent" ref={editorParentRef} className="h-full" />
@@ -120,6 +120,12 @@ for nums, target in testCases:
             className="m-4 cursor-text rounded-xl border border-blue-400 bg-black"
             onClick={handleOnConsoleCardClick}
           >
+            <div className="flex items-center border-b border-gray-800 p-2">
+              <div className="flex items-center gap-2">
+                <Terminal className="h-4 w-4" />
+                <span>console</span>
+              </div>
+            </div>
             <Card className="m-3 rounded-xl border-t border-none border-gray-800 bg-black text-white">
               <div className="h-full overflow-auto p-2 font-mono text-sm">
                 {consoleOutput.map((line, index) => (
