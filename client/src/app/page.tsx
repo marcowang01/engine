@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card"
 // import MyEditor from "@/components/ui/react-editor"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
+import { ExecuteCodeResponse } from "@/lib/schema"
 import { EditorView } from "codemirror"
 import { Code2, Terminal } from "lucide-react"
 import Script from "next/script"
@@ -15,12 +16,16 @@ export default function Page() {
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
   const [editorView, setEditorView] = useState<EditorView | null>(null)
   const [isConsoleCollapsed, setIsConsoleCollapsed] = useState(false)
-  const [currentPrompt, setCurrentPrompt] = useState(getConsolePrompt())
+  const [currentPrompt, setCurrentPrompt] = useState("")
 
   const editorParentRef = useRef<HTMLDivElement>(null)
   const consoleInputRef = useRef<HTMLInputElement>(null)
   const consoleInputParentRef = useRef<HTMLDivElement>(null)
   const consolePanelRef = useRef<any>(null)
+
+  useEffect(() => {
+    setCurrentPrompt(getConsolePrompt())
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -69,6 +74,7 @@ export default function Page() {
     }
 
     if (command === "run") {
+      const startTime = Date.now()
       const currentCode = editorView?.state.doc.toString()
 
       const response = await fetch(`${SERVER_URL}/execute-code`, {
@@ -82,8 +88,15 @@ export default function Page() {
         return
       }
 
-      const data = await response.json()
-      setConsoleOutput((prev) => [...prev, `${currentPrompt}${command}`, data.output])
+      const data = (await response.json()) as ExecuteCodeResponse
+      const timeElapsed = data.time_elapsed
+      const endTime = Date.now()
+      setConsoleOutput((prev) => [
+        ...prev,
+        `${currentPrompt}${command}`,
+        `${data.output}
+executed in ${timeElapsed}ms (${endTime - startTime}ms)`,
+      ])
       return
     }
 
