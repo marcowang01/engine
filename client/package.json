@@ -4,10 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 3003",
-    "build": "next build",
+    "build": "next build && rollup -c ./rollup.config.mjs",
     "start": "next start -p 3003",
-    "lint": "next lint",
-    "bundle": "rollup -c src/editor/rollup.config.mjs"
+    "lint": "next lint"
   },
   "dependencies": {
     "@codemirror/lang-python": "^6.1.6",
