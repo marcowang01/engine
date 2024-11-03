@@ -10,11 +10,10 @@ Rolling my own leetcode cuz I'm tired of doing actual leetcode problems.
 - Fast execution with low latency
 
 ### TODO
-- [ ] Fix styling
+- [X] Fix styling
   - [X] should fill code editor
   - [X] should fill console
   - [X] on click focus, scrolling to view
-  - [ ] add rich text support for console (colors, bold, etc)
 - [ ] Add language support
 - [X] Show latency
 - [ ] Containerize
@@ -31,3 +30,4 @@ Rolling my own leetcode cuz I'm tired of doing actual leetcode problems.
 - [ ] add streaks
 - [ ] add social 
 - [ ] easy offline practice via docker compose
+- [ ] add rich text support for console (colors, bold, etc)
