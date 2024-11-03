@@ -22,7 +22,7 @@ export default function Page() {
       return
     }
 
-    setConsoleOutput([...consoleOutput, `> ${consoleInput}`, "Command executed successfully"])
+    setConsoleOutput([...consoleOutput, `> ${consoleInput}`, `${consoleInput} command not found`])
     setConsoleInput("")
   }
 

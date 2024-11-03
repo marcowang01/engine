@@ -38,3 +38,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# rollup
+.rollup.cache
+/public/*.bundle.js
+/public/*.bundle.min.js

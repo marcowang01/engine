@@ -19,4 +19,5 @@ reflex -g src/editor/editor.ts -- sh -c \
   "pnpm rollup -c && \
   cd public && \
   npx terser editor.bundle.js -o editor.bundle.min.js && \
+  rm editor.bundle.js && \
   echo done"
