@@ -161,7 +161,7 @@ for nums, target in testCases:
           <ResizablePanel
             ref={consolePanelRef}
             defaultSize={40}
-            className="m-4 cursor-text rounded-xl border border-blue-400 bg-black"
+            className="m-4 cursor-text rounded-xl border border-blue-400"
             onClick={handleOnConsoleCardClick}
             collapsible={true}
           >
@@ -171,7 +171,7 @@ for nums, target in testCases:
                 <span>console</span>
               </div>
             </div>
-            <Card className="mx-1 h-[calc(100%-40px)] rounded-xl border-t border-none border-gray-800 bg-black text-white">
+            <Card className="h-[calc(100%-40px)] rounded-none border-0 border-t border-none bg-[#272728] text-white">
               <div
                 className="h-full overflow-y-auto p-2 font-mono text-sm"
                 ref={consoleInputParentRef}
