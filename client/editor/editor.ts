@@ -1,12 +1,32 @@
 import { EditorView } from "codemirror"
 
-import { defaultHighlightStyle, indentOnInput, syntaxHighlighting } from "@codemirror/language"
+import {
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
+} from "@codemirror/autocomplete"
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands"
+import {
+  bracketMatching,
+  defaultHighlightStyle,
+  foldGutter,
+  foldKeymap,
+  indentOnInput,
+  indentUnit,
+  syntaxHighlighting,
+} from "@codemirror/language"
+import { highlightSelectionMatches } from "@codemirror/search"
 import { EditorState } from "@codemirror/state"
 import {
+  crosshairCursor,
   drawSelection,
   highlightActiveLine,
+  highlightActiveLineGutter,
   highlightSpecialChars,
+  keymap,
   lineNumbers,
+  rectangularSelection,
 } from "@codemirror/view"
 
 // Theme
@@ -26,11 +46,30 @@ export interface EditorOptions {
 function createEditorState(initialContent: string, options: EditorOptions = {}) {
   const extensions = [
     lineNumbers(),
+    highlightActiveLineGutter(),
     highlightSpecialChars(),
+    history(),
+    foldGutter(),
     drawSelection(),
+    indentUnit.of("    "),
+    EditorState.allowMultipleSelections.of(true),
     indentOnInput(),
-    syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+    bracketMatching(),
+    closeBrackets(),
+    autocompletion(),
+    rectangularSelection(),
+    crosshairCursor(),
     highlightActiveLine(),
+    highlightSelectionMatches(),
+    keymap.of([
+      indentWithTab,
+      ...closeBracketsKeymap,
+      ...defaultKeymap,
+      ...historyKeymap,
+      ...foldKeymap,
+      ...completionKeymap,
+    ]),
+    syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
     python(),
   ]
 
