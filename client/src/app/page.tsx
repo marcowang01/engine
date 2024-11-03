@@ -7,30 +7,6 @@ import Script from "next/script"
 import { useState } from "react"
 
 export default function Page() {
-  const [code, setCode] = useState(`class Solution:
-    def getSkyline(self, buildings: List[List[int]]) -> List[List[int]]:
-        # points are either the left corner or intersect of right corner to top of building or ground
-        # we need to follow every x-cord. scan the top of buildings from left to right
-        
-        # create a function takes in a point and existing skyline and returns where to add it based on if its a left or right point
-        # if neither we would be the last traverse skyline point, we need to search before that
-        
-        skyline = []
-        for i, building in enumerate(buildings):
-            l, r, h = building
-            skyline.extend([[l,h], [r,0]])
-            
-        else:
-            positions = []
-            for j, point in enumerate(skyline): 
-                x, h = point
-                if j > 0:
-                    positions.append([x, h])
-                else:
-                    positions.append(["pos", "h"])
-                    
-        return skyline`)
-
   const [consoleInput, setConsoleInput] = useState("")
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
 
