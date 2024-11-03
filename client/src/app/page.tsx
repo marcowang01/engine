@@ -1,9 +1,9 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
-import { Code2, Terminal } from "lucide-react"
+import { Code2 } from "lucide-react"
+import Script from "next/script"
 import { useState } from "react"
 
 export default function Page() {
@@ -31,7 +31,6 @@ export default function Page() {
                     
         return skyline`)
 
-  const [showConsole, setShowConsole] = useState(false)
   const [consoleInput, setConsoleInput] = useState("")
   const [consoleOutput, setConsoleOutput] = useState(["Welcome to LeetCode CLI"])
 
@@ -53,21 +52,12 @@ export default function Page() {
                   <span>Code</span>
                 </div>
               </div>
-              <div className="flex-1 overflow-auto bg-[#1E1E1E] p-4 font-mono text-sm">
-                <pre className="text-gray-300">{code}</pre>
+              <div id="editor-parent">
+                <div id="editor" />
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="m-2 self-start"
-                onClick={() => setShowConsole(!showConsole)}
-              >
-                <Terminal className="mr-2 h-4 w-4" />
-                Toggle Console
-              </Button>
             </div>
           </ResizablePanel>
-          <ResizableHandle className="bg-blue-400 p-1 transition-opacity opacity-0 hover:opacity-100 active:opacity-100" />
+          <ResizableHandle className="bg-blue-400 p-1 opacity-0 transition-opacity hover:opacity-100 active:opacity-100" />
           <ResizablePanel defaultSize={40} className="m-4 rounded-xl border border-blue-400">
             <Card className="m-3 rounded-xl border-t border-gray-800 bg-black text-white">
               <div className="h-full overflow-auto p-2 font-mono text-sm">
@@ -89,25 +79,7 @@ export default function Page() {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-      {showConsole && (
-        <Card className="rounded-none border-t border-gray-800 bg-black text-white">
-          <div className="h-48 overflow-auto p-2 font-mono text-sm">
-            {consoleOutput.map((line, index) => (
-              <div key={index}>{line}</div>
-            ))}
-            <form onSubmit={handleConsoleSubmit} className="mt-2 flex">
-              <span className="mr-2">{">"}</span>
-              <input
-                type="text"
-                value={consoleInput}
-                onChange={(e) => setConsoleInput(e.target.value)}
-                className="flex-1 bg-transparent outline-none"
-                autoFocus
-              />
-            </form>
-          </div>
-        </Card>
-      )}
+      <Script src="/editor.bundle.js" />
     </div>
   )
 }
