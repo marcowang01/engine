@@ -11,11 +11,6 @@ import (
 
 const PORT = ":8080"
 
-type ExecuteCodeRequest struct {
-	Code     string `json:"code" validate:"required"`
-	Language string `json:"language" validate:"required"`
-}
-
 func executeCode(w http.ResponseWriter, r *http.Request) {
 	var request ExecuteCodeRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -29,7 +24,18 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "executing code %s in language %s", request.Code, request.Language)
+	fmt.Printf("recv request:\n%+v\n", request)
+
+	w.Header().Set("Content-Type", "application/json")
+
+	response := ExecuteCodeResponse{
+		Output: fmt.Sprintf("executing code %s in language %s", request.Code, request.Language),
+	}
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func setupRoutes() {

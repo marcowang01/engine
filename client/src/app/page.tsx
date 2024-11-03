@@ -3,13 +3,19 @@
 import { Card } from "@/components/ui/card"
 // import MyEditor from "@/components/ui/react-editor"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
+import { EditorView } from "codemirror"
 import { Code2 } from "lucide-react"
 import Script from "next/script"
-import { useState } from "react"
+import { useRef, useState } from "react"
+
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
 
 export default function Page() {
   const [consoleInput, setConsoleInput] = useState("")
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
+
+  const [editorView, setEditorView] = useState<EditorView | null>(null)
+  const editorParentRef = useRef<HTMLDivElement>(null)
 
   const handleConsoleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -17,23 +23,60 @@ export default function Page() {
       return
     }
 
-    if (consoleInput === "clear") {
-      setConsoleOutput([])
-      setConsoleInput("")
-      return
-    }
+    switch (consoleInput) {
+      case "clear": {
+        setConsoleOutput([])
+        setConsoleInput("")
+        return
+      }
 
-    if (consoleInput === "run") {
-      const response = await fetch("/execute-code", {
-        method: "POST",
-        body: JSON.stringify({ code: "print('hello world')", language: "python" }),
-      })
-      const data = await response.json()
-      setConsoleOutput([...consoleOutput, data])
-    }
+      case "run": {
+        const currentCode = editorView?.state.doc.toString()
 
-    setConsoleOutput([...consoleOutput, `> ${consoleInput}`, `${consoleInput} command not found`])
-    setConsoleInput("")
+        const response = await fetch(`${SERVER_URL}/execute-code`, {
+          method: "POST",
+          body: JSON.stringify({ code: currentCode, language: "python" }),
+        })
+
+        if (!response.ok) {
+          setConsoleOutput([
+            ...consoleOutput,
+            `> ${consoleInput}`,
+            `${consoleInput} command not found`,
+          ])
+          return
+        }
+
+        const data = await response.json()
+        setConsoleOutput([...consoleOutput, `> ${consoleInput}`, data.output])
+        setConsoleInput("")
+        return
+      }
+
+      default: {
+        setConsoleOutput([
+          ...consoleOutput,
+          `> ${consoleInput}`,
+          `${consoleInput} command not found`,
+        ])
+        setConsoleInput("")
+        return
+      }
+    }
+  }
+
+  const handleOnScriptLoad = () => {
+    console.log("script loaded")
+    if (
+      typeof window.createEditorState === "function" &&
+      typeof window.createEditorView === "function" &&
+      editorParentRef.current
+    ) {
+      console.log("createEditorState and createEditorView are available")
+      const initialState = window.createEditorState("print('Hello, world!')\n", { oneDark: true })
+      const editorView = window.createEditorView(initialState, editorParentRef.current)
+      setEditorView(editorView)
+    }
   }
 
   return (
@@ -48,9 +91,8 @@ export default function Page() {
                   <span>Code</span>
                 </div>
               </div>
-              <div id="editor-parent">
+              <div id="editor-parent" ref={editorParentRef}>
                 <div id="editor" />
-                {/* <MyEditor /> */}
               </div>
             </div>
           </ResizablePanel>
@@ -76,7 +118,7 @@ export default function Page() {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-      <Script src="/editor.bundle.min.js" />
+      <Script src="/editor.bundle.min.js" onLoad={handleOnScriptLoad} />
     </div>
   )
 }

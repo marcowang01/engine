@@ -48,6 +48,17 @@ function createEditorView(state: EditorState, parent: HTMLElement | null) {
   return new EditorView({ state, parent: parent || undefined })
 }
 
+declare global {
+  interface Window {
+    createEditorState: (initialContent: string, options: EditorOptions) => EditorState
+    createEditorView: (state: EditorState, parent: HTMLElement | null) => EditorView
+  }
+}
+
+window.createEditorState = createEditorState
+window.createEditorView = createEditorView
+
+/*
 const initialState = createEditorState("print('Hello, world!')\n", { oneDark: true })
 
 const editorParent = document.getElementById("editor-parent")
@@ -66,3 +77,4 @@ declare global {
 window.getCurrentCode = getCurrentCode
 
 export default editorView
+*/
