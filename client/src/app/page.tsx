@@ -79,7 +79,7 @@ export default function Page() {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-      <Script src="/editor.bundle.js" />
+      <Script src="/editor.bundle.min.js" />
     </div>
   )
 }
