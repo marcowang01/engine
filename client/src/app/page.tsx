@@ -42,7 +42,9 @@ export default function Page() {
       })
 
       if (!response.ok) {
-        setConsoleOutput([...consoleOutput, `> ${command}`, `${command} command not found`])
+        const error = await response.text()
+        setConsoleOutput([...consoleOutput, `> ${command}`, error])
+        setConsoleInput("")
         return
       }
 

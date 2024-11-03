@@ -34,7 +34,8 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 
 	output, err := executePythonCode(request.Code)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		errorMessage := fmt.Sprintf("%s\n%s", err, output)
+		http.Error(w, errorMessage, http.StatusInternalServerError)
 		return
 	}
 
@@ -55,6 +56,8 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 func executePythonCode(code string) (string, error) {
 	cmd := exec.Command("python3", "-c", code)
 	output, err := cmd.CombinedOutput()
+	fmt.Printf("output from python: %s\n", string(output))
+	fmt.Printf("error from python: %s\n", err)
 	return string(output), err
 }
 
