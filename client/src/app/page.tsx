@@ -51,7 +51,7 @@ export default function Page() {
   const handleConsoleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    handleConsoleCommands(consoleInput, currentPrompt)
+    await handleConsoleCommands(consoleInput, currentPrompt)
 
     setCurrentPrompt(getConsolePrompt())
     setConsoleInput("")
@@ -133,7 +133,6 @@ for nums, target in testCases:
   }
 
   function getConsolePrompt() {
-    // "[HH:MM:SS] "
     const timeStamp = new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
