@@ -1,6 +1,8 @@
 # Leet Code Reimagined
-## Feature wish list
-- Offline practice
-- track progress with friends
-- Duolingo type design
-- execution should be fast and snappy
+## Feature
+- Easily deploy offline and practice via docker compose
+- Duolingo style design
+  - Streaks + Friend Streaks
+  - Easy to select individual problems or a category of problems
+  - Easy to just find a new problem to work on or review weak areas
+- Fast execution with low latency
