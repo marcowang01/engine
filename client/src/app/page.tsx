@@ -14,10 +14,32 @@ export default function Page() {
   const [consoleInput, setConsoleInput] = useState("")
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
   const [editorView, setEditorView] = useState<EditorView | null>(null)
+  const [isConsoleCollapsed, setIsConsoleCollapsed] = useState(false)
 
   const editorParentRef = useRef<HTMLDivElement>(null)
   const consoleInputRef = useRef<HTMLInputElement>(null)
   const consoleInputParentRef = useRef<HTMLDivElement>(null)
+  const consolePanelRef = useRef<any>(null)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "/" && (e.ctrlKey || e.metaKey)) {
+        console.log("trying to collapse")
+
+        if (isConsoleCollapsed) {
+          consolePanelRef.current?.expand()
+          consoleInputRef.current?.focus()
+          setIsConsoleCollapsed(false)
+        } else {
+          consolePanelRef.current?.collapse()
+          setIsConsoleCollapsed(true)
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isConsoleCollapsed])
 
   useEffect(() => {
     if (consoleInputParentRef.current) {
@@ -123,9 +145,11 @@ for nums, target in testCases:
           </ResizablePanel>
           <ResizableHandle className="bg-blue-400 p-1 opacity-0 transition-opacity hover:opacity-100 active:opacity-100" />
           <ResizablePanel
+            ref={consolePanelRef}
             defaultSize={40}
             className="m-4 cursor-text rounded-xl border border-blue-400 bg-black"
             onClick={handleOnConsoleCardClick}
+            collapsible={true}
           >
             <div className="flex h-[40px] items-center border-b border-gray-800 pl-2">
               <div className="flex items-center gap-2">
@@ -133,7 +157,7 @@ for nums, target in testCases:
                 <span>console</span>
               </div>
             </div>
-            <Card className="mx-3 mb-3 h-[calc(100%-40px)] rounded-xl border-t border-none border-gray-800 bg-black text-white">
+            <Card className="mx-3 h-[calc(100%-40px)] rounded-xl border-t border-none border-gray-800 bg-black text-white">
               <div
                 className="h-full overflow-y-auto p-2 font-mono text-sm"
                 ref={consoleInputParentRef}
