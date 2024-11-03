@@ -10,22 +10,23 @@ Rolling my own leetcode cuz I'm tired of doing actual leetcode problems.
 - Fast execution with low latency
 
 ### TODO
-- Fix styling
-  - should fill box
-  - on click focus, scrolling to view
-- Add language support
-- Show latency
-- Containerize
+- [ ] Fix styling
+  - [X] should fill code editor
+  - [ ] should fill console
+  - [ ] on click focus, scrolling to view
+- [ ] Add language support
+- [ ] Show latency
+- [ ] Containerize
 
 ### This week
-- Add auth
-- Deploy
-- Add problems
-- Add tests and submissions
+- [ ] Add auth
+- [ ] Deploy
+- [ ] Add problems
+- [ ] Add tests and submissions
 
 ### Later on
-- add database support
-- persist problems, solutions and progress and test results 
-- add streaks
-- add social 
-- easy offline practice via docker compose
+- [ ] add database support
+- [ ] persist problems, solutions and progress and test results 
+- [ ] add streaks
+- [ ] add social 
+- [ ] easy offline practice via docker compose
