@@ -6,5 +6,6 @@ type ExecuteCodeRequest struct {
 }
 
 type ExecuteCodeResponse struct {
-	Output string `json:"output"`
+	Output     string `json:"output"`
+	TimeElapsed int    `json:"time_elapsed"`
 }

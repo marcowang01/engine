@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -32,6 +33,7 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	start := time.Now()
 	output, err := executePythonCode(request.Code)
 	if err != nil {
 		errorMessage := fmt.Sprintf("%s\n%s", err, output)
@@ -44,7 +46,8 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	response := ExecuteCodeResponse{
-		Output: output,
+		Output:      output,
+		TimeElapsed: int(time.Since(start).Milliseconds()),
 	}
 
 	if err := json.NewEncoder(w).Encode(response); err != nil {

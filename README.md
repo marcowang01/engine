@@ -12,10 +12,11 @@ Rolling my own leetcode cuz I'm tired of doing actual leetcode problems.
 ### TODO
 - [ ] Fix styling
   - [X] should fill code editor
-  - [ ] should fill console
-  - [ ] on click focus, scrolling to view
+  - [X] should fill console
+  - [X] on click focus, scrolling to view
+  - [ ] add rich text support for console (colors, bold, etc)
 - [ ] Add language support
-- [ ] Show latency
+- [X] Show latency
 - [ ] Containerize
 
 ### This week

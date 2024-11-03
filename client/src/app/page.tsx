@@ -8,6 +8,7 @@ import { EditorView } from "codemirror"
 import { Code2, Terminal } from "lucide-react"
 import Script from "next/script"
 import { useEffect, useRef, useState } from "react"
+import * as ResizablePrimitive from "react-resizable-panels"
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
 
@@ -21,7 +22,7 @@ export default function Page() {
   const editorParentRef = useRef<HTMLDivElement>(null)
   const consoleInputRef = useRef<HTMLInputElement>(null)
   const consoleInputParentRef = useRef<HTMLDivElement>(null)
-  const consolePanelRef = useRef<any>(null)
+  const consolePanelRef = useRef<ResizablePrimitive.ImperativePanelHandle>(null)
 
   useEffect(() => {
     setCurrentPrompt(getConsolePrompt())
