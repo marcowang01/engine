@@ -15,6 +15,7 @@ export default function Page() {
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
   const [editorView, setEditorView] = useState<EditorView | null>(null)
   const [isConsoleCollapsed, setIsConsoleCollapsed] = useState(false)
+  const [currentPrompt, setCurrentPrompt] = useState(getConsolePrompt())
 
   const editorParentRef = useRef<HTMLDivElement>(null)
   const consoleInputRef = useRef<HTMLInputElement>(null)
@@ -49,19 +50,21 @@ export default function Page() {
 
   const handleConsoleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    handleConsoleCommands(consoleInput, currentPrompt)
+
+    setCurrentPrompt(getConsolePrompt())
+    setConsoleInput("")
+  }
+
+  async function handleConsoleCommands(command: string, currentPrompt: string) {
     if (consoleInput === "") {
-      setConsoleOutput((prev) => [...prev, "> "])
-      setConsoleInput("")
+      setConsoleOutput((prev) => [...prev, currentPrompt])
       return
     }
 
-    handleConsoleCommands(consoleInput)
-  }
-
-  async function handleConsoleCommands(command: string) {
     if (command === "clear") {
       setConsoleOutput([])
-      setConsoleInput("")
       return
     }
 
@@ -75,19 +78,20 @@ export default function Page() {
 
       if (!response.ok) {
         const error = await response.text()
-        setConsoleOutput((prev) => [...prev, `> ${command}`, error])
-        setConsoleInput("")
+        setConsoleOutput((prev) => [...prev, `${currentPrompt}${command}`, error])
         return
       }
 
       const data = await response.json()
-      setConsoleOutput((prev) => [...prev, `> ${command}`, data.output])
-      setConsoleInput("")
+      setConsoleOutput((prev) => [...prev, `${currentPrompt}${command}`, data.output])
       return
     }
 
-    setConsoleOutput((prev) => [...prev, `> ${command}`, `sh: command not found: ${command}`])
-    setConsoleInput("")
+    setConsoleOutput((prev) => [
+      ...prev,
+      `${currentPrompt}${command}`,
+      `sh: command not found: ${command}`,
+    ])
     return
   }
 
@@ -128,6 +132,17 @@ for nums, target in testCases:
     consoleInputRef.current?.focus()
   }
 
+  function getConsolePrompt() {
+    // "[HH:MM:SS] "
+    const timeStamp = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
+
+    return `[${timeStamp}] > `
+  }
+
   return (
     <div className="flex h-screen flex-col bg-[#1E1E1E] text-white">
       <div className="flex-1 overflow-hidden">
@@ -157,18 +172,18 @@ for nums, target in testCases:
                 <span>console</span>
               </div>
             </div>
-            <Card className="mx-3 h-[calc(100%-40px)] rounded-xl border-t border-none border-gray-800 bg-black text-white">
+            <Card className="mx-1 h-[calc(100%-40px)] rounded-xl border-t border-none border-gray-800 bg-black text-white">
               <div
                 className="h-full overflow-y-auto p-2 font-mono text-sm"
                 ref={consoleInputParentRef}
               >
                 {consoleOutput.map((line, index) => (
-                  <div key={index} className="mb-1">
+                  <div key={index} className="mb-0">
                     <pre>{line}</pre>
                   </div>
                 ))}
                 <form onSubmit={handleConsoleSubmit} className="flex">
-                  <span className="mr-2">{">"}</span>
+                  <span className="mr-2">{currentPrompt}</span>
                   <input
                     type="text"
                     ref={consoleInputRef}
