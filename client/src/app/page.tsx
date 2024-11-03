@@ -32,7 +32,7 @@ export default function Page() {
         return skyline`)
 
   const [consoleInput, setConsoleInput] = useState("")
-  const [consoleOutput, setConsoleOutput] = useState(["Welcome to LeetCode CLI"])
+  const [consoleOutput, setConsoleOutput] = useState<string[]>([])
 
   const handleConsoleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
