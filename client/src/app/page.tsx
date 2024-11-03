@@ -67,7 +67,14 @@ export default function Page() {
       editorParentRef.current
     ) {
       console.log("createEditorState and createEditorView are available")
-      const initialState = window.createEditorState("print('Hello, world!')\n", { oneDark: true })
+
+      const initialPythonProgram = `print("Hello, world!")
+
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        pass
+`
+      const initialState = window.createEditorState(initialPythonProgram, { oneDark: true })
       const editorView = window.createEditorView(initialState, editorParentRef.current)
       setEditorView(editorView)
     }
