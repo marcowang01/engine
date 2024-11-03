@@ -19,6 +19,10 @@ export interface EditorOptions {
   oneDark?: boolean
 }
 
+/*
+ * all code in here runs in the client browser !
+ */
+
 function createEditorState(initialContent: string, options: EditorOptions = {}) {
   const extensions = [
     lineNumbers(),
@@ -48,5 +52,17 @@ const initialState = createEditorState("print('Hello, world!')\n", { oneDark: tr
 
 const editorParent = document.getElementById("editor-parent")
 const editorView = createEditorView(initialState, editorParent)
+
+export function getCurrentCode() {
+  return editorView.state.doc.toString()
+}
+
+declare global {
+  interface Window {
+    getCurrentCode: () => string
+  }
+}
+
+window.getCurrentCode = getCurrentCode
 
 export default editorView

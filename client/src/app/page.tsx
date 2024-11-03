@@ -1,6 +1,7 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
+// import MyEditor from "@/components/ui/react-editor"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { Code2 } from "lucide-react"
 import Script from "next/script"
@@ -10,7 +11,7 @@ export default function Page() {
   const [consoleInput, setConsoleInput] = useState("")
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
 
-  const handleConsoleSubmit = (e: React.FormEvent) => {
+  const handleConsoleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (consoleInput === "") {
       return
@@ -20,6 +21,15 @@ export default function Page() {
       setConsoleOutput([])
       setConsoleInput("")
       return
+    }
+
+    if (consoleInput === "run") {
+      const response = await fetch("/execute-code", {
+        method: "POST",
+        body: JSON.stringify({ code: "print('hello world')", language: "python" }),
+      })
+      const data = await response.json()
+      setConsoleOutput([...consoleOutput, data])
     }
 
     setConsoleOutput([...consoleOutput, `> ${consoleInput}`, `${consoleInput} command not found`])
@@ -40,6 +50,7 @@ export default function Page() {
               </div>
               <div id="editor-parent">
                 <div id="editor" />
+                {/* <MyEditor /> */}
               </div>
             </div>
           </ResizablePanel>
