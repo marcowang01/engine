@@ -1,18 +1,19 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"time"
 
 	"github.com/go-playground/validator/v10"
 )
 
-const pythonImage = "3.13.0-alpine3.19"
+const pythonImage = "python:3.13.0-alpine3.19"
 
 func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 	var request ExecuteCodeRequest
@@ -42,8 +43,6 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("output: %s\n", output)
-
 	w.Header().Set("Content-Type", "application/json")
 
 	response := ExecuteCodeResponse{
@@ -58,22 +57,18 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 }
 
 func runPythonDockerContainer(code string) (string, error) {
+	// encode and decode the code to avoid issues with special characters (i.e. quotes)
+	encodedCode := base64.StdEncoding.EncodeToString([]byte(code))
+	command := fmt.Sprintf("sh -c 'echo \"%s\" | base64 -d > program.py && python3 program.py'", encodedCode)
 
-	// TODO: encode and decode the code to avoid issues with special characters
-	/*
-			      command = `sh -c "echo '${Buffer.from(code).toString(
-		        "base64"
-		      )}' | base64 -d > program.py && python3 program.py"`;
-	*/
+	cmd := exec.Command(
+		"docker", "run", "--env-file", ".env.docker", "--rm", pythonImage,
+		"sh", "-c", command,
+	)
 
-	// TODO: add a timeout to kill the container if it takes too long
-	command := fmt.Sprintf("python3 -c '%s'", code)
-	containerCommand := fmt.Sprintf("docker run --rm %s sh -c %s", pythonImage, command)
-
-	cmd := exec.Command("sh", "-c", containerCommand)
 	output, err := cmd.CombinedOutput()
-	fmt.Printf("output from python: %s\n", string(output))
-	fmt.Printf("error from python: %s\n", err)
+	fmt.Printf("output from running python container: %s\n", string(output))
+	fmt.Printf("error from running python container: %s\n", err)
 	return string(output), err
 }
 
@@ -89,21 +84,40 @@ func setupRoutes() {
 	http.HandleFunc("/execute-code", handleExecuteCode)
 }
 
-func pullPythonImage() error {
+func pullPythonImage() (string, error) {
+	fmt.Printf("pulling python image: %s\n", pythonImage)
 	cmd := exec.Command("docker", "pull", pythonImage)
-	return cmd.Run()
+	output, err := cmd.CombinedOutput()
+	fmt.Printf(" %s\ndone pulling python image\n", string(output))
+	return string(output), err
+}
+
+func getEnvironment() string {
+	env := os.Getenv("ENVIRONMENT")
+	if env == "" {
+		env = "local"
+	}
+	return env
+}
+
+func getPort() string {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	return port
 }
 
 func main() {
-	port := flag.String("port", "8080", "port to listen on")
-	flag.Parse()
+	env := getEnvironment()
+	port := getPort()
 
-	address := fmt.Sprintf(":%s", *port)
-	fmt.Printf("starting server on port %s\n", *port)
+	address := fmt.Sprintf(":%s", port)
+	fmt.Printf("starting server on port %s (%s)\n", port, env)
 
 	// TODO: figure out how this works if it is async
-	if err := pullPythonImage(); err != nil {
-		log.Fatalf("failed to pull python image: %s", err)
+	if output, err := pullPythonImage(); err != nil {
+		log.Fatalf("failed to pull python image: %s\n%s", err, output)
 	}
 
 	setupRoutes()

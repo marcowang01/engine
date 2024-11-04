@@ -15,3 +15,7 @@
 
 # Windows
 Thumbs.db
+
+# Environment
+.env
+.env.*

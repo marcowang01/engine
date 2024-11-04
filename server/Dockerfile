@@ -11,7 +11,7 @@ RUN apk add --no-cache go python3
 WORKDIR /usr/src/app
 
 # copy the needed files into the image
-COPY go.mod go.sum ./*.go ./
+COPY go.mod go.sum .env.docker ./*.go ./
 
 # build the application
 RUN go mod download
@@ -24,4 +24,4 @@ EXPOSE 2375
 ENV DOCKER_HOST=tcp://0.0.0.0:2375
 
 # start docker daemon and the application
-CMD ["sh", "-c", "dockerd --host=tcp://0.0.0.0:2375 & sleep 5 && ./main --port 8080"]
+CMD ["sh", "-c", "dockerd --host=tcp://0.0.0.0:2375 & sleep 5 && ./main"]

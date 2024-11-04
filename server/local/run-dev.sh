@@ -4,4 +4,7 @@ SCRIPT_PATH="$(cd "$(dirname "$0")" && pwd)"
 
 cd $SCRIPT_PATH/../
 
-go run . --port 8080
+# load environment variables
+source .env
+
+go run .
