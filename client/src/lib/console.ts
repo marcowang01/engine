@@ -22,10 +22,20 @@ export async function handleConsoleCommands(
     const startTime = Date.now()
     const currentCode = getCurrentCodeFromEditor()
 
-    const response = await fetch(`${SERVER_URL}/execute-code`, {
-      method: "POST",
-      body: JSON.stringify({ code: currentCode, language: "python" }),
-    })
+    let response: Response
+    try {
+      response = await fetch(`${SERVER_URL}/execute-code`, {
+        method: "POST",
+        body: JSON.stringify({ code: currentCode, language: "python" }),
+      })
+    } catch (error) {
+      setConsoleOutput((prev) => [
+        ...prev,
+        `${currentPrompt}${command}`,
+        `ExecutionServerError: ${error}`,
+      ])
+      return
+    }
 
     if (!response.ok) {
       const error = await response.text()
@@ -33,7 +43,17 @@ export async function handleConsoleCommands(
       return
     }
 
-    const data = (await response.json()) as ExecuteCodeResponse
+    let data: ExecuteCodeResponse
+    try {
+      data = (await response.json()) as ExecuteCodeResponse
+    } catch (error) {
+      setConsoleOutput((prev) => [
+        ...prev,
+        `${currentPrompt}${command}`,
+        `ServerResponseParseError: ${error}`,
+      ])
+      return
+    }
     const timeElapsed = data.time_elapsed
     const endTime = Date.now()
     setConsoleOutput((prev) => [
