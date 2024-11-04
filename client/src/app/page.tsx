@@ -12,8 +12,18 @@ import * as ResizablePrimitive from "react-resizable-panels"
 
 const CONSOLE_HISTORY_SIZE = 20
 
+export interface ConsoleHistoryEntry {
+  original: string
+  buffer: string
+}
+
 export default function Page() {
-  const [consoleHistory, setConsoleHistory] = useState<string[]>([""])
+  const [consoleHistory, setConsoleHistory] = useState<ConsoleHistoryEntry[]>([
+    {
+      original: "",
+      buffer: "",
+    },
+  ])
   const [consoleHistoryIndex, setConsoleHistoryIndex] = useState(0)
 
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
@@ -68,7 +78,6 @@ export default function Page() {
       const input = consoleInputRef.current
       input.focus()
       input.selectionStart = input.selectionEnd = input.value.length
-
     }
   }, [consoleHistoryIndex])
 
@@ -81,19 +90,29 @@ export default function Page() {
   const handleConsoleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    const command = consoleHistory[consoleHistoryIndex].buffer
+
     await handleConsoleCommands(
-      consoleHistory[consoleHistoryIndex],
+      command,
       currentPrompt,
       setConsoleOutput,
       () => editorView?.state.doc.toString() ?? "",
       () => {
         setConsoleHistory((prev) => {
-          let newHistory: string[]
+          let newHistory: ConsoleHistoryEntry[]
+          prev[prev.length - 1].original = command
+
           if (prev.length >= CONSOLE_HISTORY_SIZE) {
-            newHistory = [...prev.slice(1), ""]
+            newHistory = [...prev.slice(1), { original: "", buffer: "" }]
           } else {
-            newHistory = [...prev, ""]
+            newHistory = [...prev, { original: "", buffer: "" }]
           }
+
+          // TODO: can optimize this to be amortized O(1) on average
+          newHistory.map((entry) => {
+            entry.buffer = entry.original
+          })
+
           setConsoleHistoryIndex(newHistory.length - 1)
           return newHistory
         })
@@ -194,10 +213,10 @@ for nums, target in testCases:
                   <input
                     type="text"
                     ref={consoleInputRef}
-                    value={consoleHistory[consoleHistoryIndex]}
+                    value={consoleHistory[consoleHistoryIndex].buffer}
                     onChange={(e) => {
                       setConsoleHistory((prev) => {
-                        prev[consoleHistoryIndex] = e.target.value
+                        prev[consoleHistoryIndex].buffer = e.target.value
                         return [...prev]
                       })
                     }}

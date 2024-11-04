@@ -14,71 +14,71 @@ export async function handleConsoleCommands(
     return
   }
 
-  onSubmitNewCommand()
+  switch (command) {
+    case "clear":
+      setConsoleOutput([])
+      break
+    case "run":
+    case "r":
+      const startTime = Date.now()
+      const currentCode = getCurrentCodeFromEditor()
 
-  if (command === "clear") {
-    setConsoleOutput([])
-    return
-  }
+      let response: Response
+      try {
+        response = await fetch(`${SERVER_URL}/execute-code`, {
+          method: "POST",
+          body: JSON.stringify({ code: currentCode, language: "python" }),
+        })
+      } catch (error) {
+        setConsoleOutput((prev) => [
+          ...prev,
+          `${currentPrompt}${command}`,
+          `ExecutionServerError: ${error}`,
+        ])
+        break
+      }
 
-  if (command === "run" || command === "r") {
-    const startTime = Date.now()
-    const currentCode = getCurrentCodeFromEditor()
+      if (!response.ok) {
+        const error = await response.text()
+        setConsoleOutput((prev) => [...prev, `${currentPrompt}${command}`, error])
+        break
+      }
 
-    let response: Response
-    try {
-      response = await fetch(`${SERVER_URL}/execute-code`, {
-        method: "POST",
-        body: JSON.stringify({ code: currentCode, language: "python" }),
-      })
-    } catch (error) {
+      let data: ExecuteCodeResponse
+      try {
+        data = (await response.json()) as ExecuteCodeResponse
+      } catch (error) {
+        setConsoleOutput((prev) => [
+          ...prev,
+          `${currentPrompt}${command}`,
+          `ServerResponseParseError: ${error}`,
+        ])
+        break
+      }
+      const timeElapsed = data.time_elapsed
+      const endTime = Date.now()
       setConsoleOutput((prev) => [
         ...prev,
         `${currentPrompt}${command}`,
-        `ExecutionServerError: ${error}`,
-      ])
-      return
-    }
-
-    if (!response.ok) {
-      const error = await response.text()
-      setConsoleOutput((prev) => [...prev, `${currentPrompt}${command}`, error])
-      return
-    }
-
-    let data: ExecuteCodeResponse
-    try {
-      data = (await response.json()) as ExecuteCodeResponse
-    } catch (error) {
-      setConsoleOutput((prev) => [
-        ...prev,
-        `${currentPrompt}${command}`,
-        `ServerResponseParseError: ${error}`,
-      ])
-      return
-    }
-    const timeElapsed = data.time_elapsed
-    const endTime = Date.now()
-    setConsoleOutput((prev) => [
-      ...prev,
-      `${currentPrompt}${command}`,
-      `${data.output}
+        `${data.output}
 executed in ${timeElapsed}ms (${endTime - startTime}ms)`,
-    ])
-    return
+      ])
+      break
+
+    case "help":
+    case "h":
+      setConsoleOutput((prev) => [...prev, `${currentPrompt}${command}`, getHelpText()])
+      break
+    default:
+      setConsoleOutput((prev) => [
+        ...prev,
+        `${currentPrompt}${command}`,
+        `sh: command not found: ${command}. Type "help" for more information.`,
+      ])
+      break
   }
 
-  if (command === "help" || command === "h") {
-    setConsoleOutput((prev) => [...prev, `${currentPrompt}${command}`, getHelpText()])
-    return
-  }
-
-  setConsoleOutput((prev) => [
-    ...prev,
-    `${currentPrompt}${command}`,
-    `sh: command not found: ${command}. Type "help" for more information.`,
-  ])
-  return
+  onSubmitNewCommand()
 }
 
 function getHelpText() {
