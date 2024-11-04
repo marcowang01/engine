@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,8 +11,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 )
-
-const PORT = ":8080"
 
 func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 	var request ExecuteCodeRequest
@@ -69,7 +68,12 @@ func setupRoutes() {
 }
 
 func main() {
-	fmt.Printf("staring server on port %s\n", PORT)
+	port := flag.String("port", "8080", "port to listen on")
+	flag.Parse()
+
+	address := fmt.Sprintf(":%s", *port)
+	fmt.Printf("starting server on port %s\n", *port)
+
 	setupRoutes()
-	log.Fatal(http.ListenAndServe(PORT, nil))
+	log.Fatal(http.ListenAndServe(address, nil))
 }
