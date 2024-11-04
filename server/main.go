@@ -18,46 +18,48 @@ const pythonImage = "python:3.13.0-alpine3.19"
 func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 	var request ExecuteCodeRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Printf("Error decoding request body: %v", err)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	if err := validate.Struct(request); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Printf("Validation error: %v", err)
+		http.Error(w, "Invalid request parameters", http.StatusBadRequest)
 		return
 	}
 
-	fmt.Printf("recv request:\n%+v\n", request)
+	log.Printf("Received execution request for language: %s", request.Language)
 
 	if request.Language != "python" {
-		http.Error(w, "unsupported language", http.StatusBadRequest)
+		log.Printf("Unsupported language requested: %s", request.Language)
+		http.Error(w, "Unsupported language", http.StatusBadRequest)
 		return
 	}
 
 	start := time.Now()
 	output, err := runPythonDockerContainer(request.Code)
 	if err != nil {
-		errorMessage := fmt.Sprintf("%s\n%s", err, output)
-		http.Error(w, errorMessage, http.StatusInternalServerError)
+		log.Printf("Error executing code: %v", err)
+		http.Error(w, fmt.Sprintf("Execution error: %v", err), http.StatusInternalServerError)
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
 
 	response := ExecuteCodeResponse{
 		Output:      output,
 		TimeElapsed: int(time.Since(start).Milliseconds()),
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Error encoding response: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 }
 
 func runPythonDockerContainer(code string) (string, error) {
-	// encode and decode the code to avoid issues with special characters (i.e. quotes)
 	encodedCode := base64.StdEncoding.EncodeToString([]byte(code))
 	command := fmt.Sprintf("sh -c 'echo \"%s\" | base64 -d > program.py && python3 program.py'", encodedCode)
 
@@ -67,60 +69,70 @@ func runPythonDockerContainer(code string) (string, error) {
 	)
 
 	output, err := cmd.CombinedOutput()
-	fmt.Printf("output from running python container: %s\n", string(output))
-	fmt.Printf("error from running python container: %s\n", err)
-	return string(output), err
+	if err != nil {
+		log.Printf("Docker execution error: %v, Output: %s", err, output)
+		return "", err
+	}
+
+	log.Printf("Code executed successfully in Docker container")
+	return string(output), nil
 }
 
 func executePythonCode(code string) (string, error) {
 	cmd := exec.Command("python3", "-c", code)
 	output, err := cmd.CombinedOutput()
-	fmt.Printf("output from python: %s\n", string(output))
-	fmt.Printf("error from python: %s\n", err)
-	return string(output), err
+	if err != nil {
+		log.Printf("Python execution error: %v, Output: %s", err, output)
+		return "", err
+	}
+
+	log.Printf("Code executed successfully using local Python")
+	return string(output), nil
 }
 
 func setupRoutes() {
 	http.HandleFunc("/execute-code", handleExecuteCode)
 }
 
-func pullPythonImage() (string, error) {
-	fmt.Printf("pulling python image: %s\n", pythonImage)
-	cmd := exec.Command(
-		"docker", "pull",
-		pythonImage,
-	)
+func pullPythonImage() error {
+	log.Printf("Pulling Python image: %s", pythonImage)
+	cmd := exec.Command("docker", "pull", pythonImage)
 
 	output, err := cmd.CombinedOutput()
-	fmt.Printf(" %s\ndone pulling python image\n", string(output))
-	return string(output), err
+	if err != nil {
+		log.Printf("Error pulling Python image: %v, Output: %s", err, output)
+		return err
+	}
+
+	log.Printf("Python image pulled successfully")
+	return nil
 }
 
 func getEnvironment() string {
-	env := os.Getenv("ENVIRONMENT")
-	if env == "" {
-		env = "local"
+	if env := os.Getenv("ENVIRONMENT"); env != "" {
+		return env
 	}
-	return env
+	return "local"
 }
 
 func getPort() string {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+	if port := os.Getenv("PORT"); port != "" {
+		return port
 	}
-	return port
+	return "8080"
 }
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	env := getEnvironment()
 	port := getPort()
 
 	address := fmt.Sprintf(":%s", port)
-	fmt.Printf("starting server on port %s (%s)\n", port, env)
+	log.Printf("Starting server on port %s (%s environment)", port, env)
 
-	if output, err := pullPythonImage(); err != nil {
-		log.Fatalf("failed to pull python image: %s\n%s", err, output)
+	if err := pullPythonImage(); err != nil {
+		log.Fatalf("Failed to pull Python image: %v", err)
 	}
 
 	setupRoutes()
