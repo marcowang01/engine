@@ -1,6 +1,6 @@
 module marcowang01/leet-coder
 
-go 1.23.2
+go 1.22.8
 
 require (
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect

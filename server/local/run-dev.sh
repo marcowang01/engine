@@ -7,4 +7,4 @@ cd $SCRIPT_PATH/../
 # load environment variables
 source .env
 
-go run .
+go1.22.8 run .

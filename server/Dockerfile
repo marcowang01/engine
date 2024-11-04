@@ -3,9 +3,9 @@
 # needed for running docker in docker method
 FROM docker:27.3-dind
 
-# install go and python3
+# install go
 # docker image is based on alpine
-RUN apk add --no-cache go python3
+RUN apk add --no-cache go=1.22.8-r0
 
 # set working directory
 WORKDIR /usr/src/app
@@ -24,4 +24,4 @@ EXPOSE 2375
 ENV DOCKER_HOST=tcp://0.0.0.0:2375
 
 # start docker daemon and the application
-CMD ["sh", "-c", "dockerd --host=tcp://0.0.0.0:2375 & sleep 5 && ./main"]
+CMD ["sh", "-c", "dockerd --host=tcp://0.0.0.0:2375 --tls=false --tlsverify=false & sleep 10 && ./main"]
