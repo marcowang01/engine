@@ -19,10 +19,10 @@ Rolling my own leetcode cuz I'm tired of doing actual leetcode problems.
 - [X] Containerize
 
 ### This week
-- [ ] Add auth
-- [ ] Deploy
 - [ ] Add problems
 - [ ] Add tests and submissions
+- [ ] Add auth
+- [ ] Deploy
 
 ### Later on
 - [ ] add database support
