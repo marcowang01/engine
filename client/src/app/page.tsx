@@ -43,8 +43,6 @@ export default function Page() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "/" && (e.ctrlKey || e.metaKey)) {
-        console.log("trying to collapse")
-
         if (isConsoleCollapsed) {
           consolePanelRef.current?.expand()
           consoleInputRef.current?.focus()
@@ -173,7 +171,7 @@ for nums, target in testCases:
     <div className="flex h-screen flex-col bg-[#1E1E1E] text-white">
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup direction="vertical" className="h-full">
-          <ResizablePanel defaultSize={60} className="m-4 rounded-xl border border-blue-400">
+          <ResizablePanel defaultSize={60} className="m-4 mb-1 rounded-xl border border-blue-400">
             <div className="flex h-full flex-col">
               <div className="flex h-[40px] items-center border-b border-gray-800 pl-2">
                 <div className="flex items-center gap-2">
@@ -184,11 +182,11 @@ for nums, target in testCases:
               <div id="editor-parent" ref={editorParentRef} className="h-[calc(100%-40px)]" />
             </div>
           </ResizablePanel>
-          <ResizableHandle className="bg-blue-400 p-1 opacity-0 transition-opacity hover:opacity-100 active:opacity-100" />
+          <ResizableHandle className="bg-gray-600 p-0.5 m-0.5 opacity-0 transition-opacity hover:opacity-100 active:opacity-100" />
           <ResizablePanel
             ref={consolePanelRef}
             defaultSize={40}
-            className="m-4 cursor-text rounded-xl border border-blue-400"
+            className="m-4 mt-1 cursor-text rounded-xl border border-gray-600"
             onClick={handleOnConsoleCardClick}
             collapsible={true}
           >
@@ -200,7 +198,7 @@ for nums, target in testCases:
             </div>
             <Card className="h-[calc(100%-40px)] rounded-none border-0 border-t border-none bg-[#272728] text-white">
               <div
-                className="h-full overflow-y-auto p-2 font-mono text-sm"
+                className="h-full overflow-y-auto p-2 font-mono text-xs"
                 ref={consoleInputParentRef}
               >
                 {consoleOutput.map((line, index) => (
