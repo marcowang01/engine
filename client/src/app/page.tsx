@@ -182,7 +182,7 @@ for nums, target in testCases:
               <div id="editor-parent" ref={editorParentRef} className="h-[calc(100%-40px)]" />
             </div>
           </ResizablePanel>
-          <ResizableHandle className="bg-gray-600 p-0.5 m-0.5 opacity-0 transition-opacity hover:opacity-100 active:opacity-100" />
+          <ResizableHandle className="m-0.5 bg-gray-600 p-0.5 opacity-0 transition-opacity hover:opacity-100 active:opacity-100" />
           <ResizablePanel
             ref={consolePanelRef}
             defaultSize={40}
