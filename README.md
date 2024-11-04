@@ -16,7 +16,7 @@ Rolling my own leetcode cuz I'm tired of doing actual leetcode problems.
   - [X] on click focus, scrolling to view
 - [ ] Add language support
 - [X] Show latency
-- [ ] Containerize
+- [X] Containerize
 
 ### This week
 - [ ] Add auth
