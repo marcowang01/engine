@@ -35,7 +35,7 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	start := time.Now()
-	output, err := executePythonCode(request.Code)
+	output, err := runPythonDockerContainer(request.Code)
 	if err != nil {
 		errorMessage := fmt.Sprintf("%s\n%s", err, output)
 		http.Error(w, errorMessage, http.StatusInternalServerError)
@@ -55,6 +55,26 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func runPythonDockerContainer(code string) (string, error) {
+
+	// TODO: encode and decode the code to avoid issues with special characters
+	/*
+			      command = `sh -c "echo '${Buffer.from(code).toString(
+		        "base64"
+		      )}' | base64 -d > program.py && python3 program.py"`;
+	*/
+
+	// TODO: add a timeout to kill the container if it takes too long
+	command := fmt.Sprintf("python3 -c '%s'", code)
+	containerCommand := fmt.Sprintf("docker run --rm %s sh -c %s", pythonImage, command)
+
+	cmd := exec.Command("sh", "-c", containerCommand)
+	output, err := cmd.CombinedOutput()
+	fmt.Printf("output from python: %s\n", string(output))
+	fmt.Printf("error from python: %s\n", err)
+	return string(output), err
 }
 
 func executePythonCode(code string) (string, error) {
@@ -81,6 +101,7 @@ func main() {
 	address := fmt.Sprintf(":%s", *port)
 	fmt.Printf("starting server on port %s\n", *port)
 
+	// TODO: figure out how this works if it is async
 	if err := pullPythonImage(); err != nil {
 		log.Fatalf("failed to pull python image: %s", err)
 	}
