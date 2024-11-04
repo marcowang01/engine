@@ -12,6 +12,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+const pythonImage = "3.13.0-alpine3.19"
+
 func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 	var request ExecuteCodeRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -67,12 +69,21 @@ func setupRoutes() {
 	http.HandleFunc("/execute-code", handleExecuteCode)
 }
 
+func pullPythonImage() error {
+	cmd := exec.Command("docker", "pull", pythonImage)
+	return cmd.Run()
+}
+
 func main() {
 	port := flag.String("port", "8080", "port to listen on")
 	flag.Parse()
 
 	address := fmt.Sprintf(":%s", *port)
 	fmt.Printf("starting server on port %s\n", *port)
+
+	if err := pullPythonImage(); err != nil {
+		log.Fatalf("failed to pull python image: %s", err)
+	}
 
 	setupRoutes()
 	log.Fatal(http.ListenAndServe(address, nil))
