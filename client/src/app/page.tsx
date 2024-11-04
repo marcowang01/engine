@@ -10,9 +10,10 @@ import Script from "next/script"
 import { useEffect, useRef, useState } from "react"
 import * as ResizablePrimitive from "react-resizable-panels"
 
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
-
 export default function Page() {
+  const [consoleHistory, setConsoleHistory] = useState<string[]>([])
+  const consoleHistoryIndex = useRef(0)
+
   const [consoleInput, setConsoleInput] = useState("")
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
   const [editorView, setEditorView] = useState<EditorView | null>(null)
@@ -41,13 +42,49 @@ export default function Page() {
           consolePanelRef.current?.collapse()
           setIsConsoleCollapsed(true)
         }
+        return
+      }
+
+      if (e.key === "ArrowUp") {
+        consoleHistoryIndex.current = Math.max(consoleHistoryIndex.current - 1, 0)
+        console.log(consoleHistoryIndex.current)
+        if (consoleHistoryIndex.current < consoleHistory.length) {
+          setConsoleInput(consoleHistory[consoleHistoryIndex.current])
+        } else {
+          setConsoleInput("")
+        }
+
+        return
+      }
+
+      if (e.key === "ArrowDown") {
+        consoleHistoryIndex.current = Math.min(
+          consoleHistoryIndex.current + 1,
+          consoleHistory.length
+        )
+        if (consoleHistoryIndex.current < consoleHistory.length) {
+          setConsoleInput(consoleHistory[consoleHistoryIndex.current])
+        } else {
+          setConsoleInput("")
+        }
+        return
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isConsoleCollapsed])
+  }, [
+    isConsoleCollapsed,
+    consoleHistory,
+    consoleInput,
+    consoleHistoryIndex,
+    setConsoleInput,
+    setIsConsoleCollapsed,
+  ])
 
+  useEffect(() => {
+    console.log(consoleHistory)
+  }, [consoleHistory])
   useEffect(() => {
     if (consoleInputParentRef.current) {
       consoleInputParentRef.current.scrollTop = consoleInputParentRef.current.scrollHeight
@@ -61,7 +98,13 @@ export default function Page() {
       consoleInput,
       currentPrompt,
       setConsoleOutput,
-      () => editorView?.state.doc.toString() ?? ""
+      () => editorView?.state.doc.toString() ?? "",
+      () => {
+        setConsoleHistory((prev) => {
+          consoleHistoryIndex.current = prev.length + 1
+          return [...prev, consoleInput]
+        })
+      }
     )
 
     setCurrentPrompt(getConsolePrompt())

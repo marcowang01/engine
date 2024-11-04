@@ -1,17 +1,21 @@
 import { ExecuteCodeResponse } from "./schema"
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
+const CONSOLE_HISTORY_SIZE = 100
 
 export async function handleConsoleCommands(
   command: string,
   currentPrompt: string,
   setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
-  getCurrentCodeFromEditor: () => string
+  getCurrentCodeFromEditor: () => string,
+  onSubmitNewCommand: () => void
 ) {
   if (command === "") {
     setConsoleOutput((prev) => [...prev, currentPrompt])
     return
   }
+
+  onSubmitNewCommand()
 
   if (command === "clear") {
     setConsoleOutput([])
