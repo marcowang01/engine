@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 // import MyEditor from "@/components/ui/react-editor"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
-import { ExecuteCodeResponse } from "@/lib/schema"
+import { handleConsoleCommands } from "@/lib/console"
 import { EditorView } from "codemirror"
 import { Code2, Terminal } from "lucide-react"
 import Script from "next/script"
@@ -57,56 +57,15 @@ export default function Page() {
   const handleConsoleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    await handleConsoleCommands(consoleInput, currentPrompt)
+    await handleConsoleCommands(
+      consoleInput,
+      currentPrompt,
+      setConsoleOutput,
+      () => editorView?.state.doc.toString() ?? ""
+    )
 
     setCurrentPrompt(getConsolePrompt())
     setConsoleInput("")
-  }
-
-  async function handleConsoleCommands(command: string, currentPrompt: string) {
-    if (consoleInput === "") {
-      setConsoleOutput((prev) => [...prev, currentPrompt])
-      return
-    }
-
-    if (command === "clear") {
-      setConsoleOutput([])
-      return
-    }
-
-    if (command === "run") {
-      const startTime = Date.now()
-      const currentCode = editorView?.state.doc.toString()
-
-      const response = await fetch(`${SERVER_URL}/execute-code`, {
-        method: "POST",
-        body: JSON.stringify({ code: currentCode, language: "python" }),
-      })
-
-      if (!response.ok) {
-        const error = await response.text()
-        setConsoleOutput((prev) => [...prev, `${currentPrompt}${command}`, error])
-        return
-      }
-
-      const data = (await response.json()) as ExecuteCodeResponse
-      const timeElapsed = data.time_elapsed
-      const endTime = Date.now()
-      setConsoleOutput((prev) => [
-        ...prev,
-        `${currentPrompt}${command}`,
-        `${data.output}
-executed in ${timeElapsed}ms (${endTime - startTime}ms)`,
-      ])
-      return
-    }
-
-    setConsoleOutput((prev) => [
-      ...prev,
-      `${currentPrompt}${command}`,
-      `sh: command not found: ${command}`,
-    ])
-    return
   }
 
   const handleOnScriptLoad = () => {
@@ -168,7 +127,7 @@ for nums, target in testCases:
                   <span>code</span>
                 </div>
               </div>
-              <div id="editor-parent" ref={editorParentRef} className="h-full" />
+              <div id="editor-parent" ref={editorParentRef} className="h-[calc(100%-40px)]" />
             </div>
           </ResizablePanel>
           <ResizableHandle className="bg-blue-400 p-1 opacity-0 transition-opacity hover:opacity-100 active:opacity-100" />
