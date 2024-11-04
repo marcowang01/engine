@@ -8,15 +8,8 @@ API server for connecting client to the execution engine.
 
 ## Running the server in docker
 
-### Generate certificates
-
 ```bash
-./local/generate-certs.sh
+./local/run-docker.sh [--keygen]
 ```
 
-### Run the server
-
-```bash
-docker compose up
-```
-
+`--keygen` will generate the certificates and keys for the server.
