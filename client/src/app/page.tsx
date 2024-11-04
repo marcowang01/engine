@@ -10,11 +10,12 @@ import Script from "next/script"
 import { useEffect, useRef, useState } from "react"
 import * as ResizablePrimitive from "react-resizable-panels"
 
-export default function Page() {
-  const [consoleHistory, setConsoleHistory] = useState<string[]>([])
-  const consoleHistoryIndex = useRef(0)
+const CONSOLE_HISTORY_SIZE = 20
 
-  const [consoleInput, setConsoleInput] = useState("")
+export default function Page() {
+  const [consoleHistory, setConsoleHistory] = useState<string[]>([""])
+  const [consoleHistoryIndex, setConsoleHistoryIndex] = useState(0)
+
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
   const [editorView, setEditorView] = useState<EditorView | null>(null)
   const [isConsoleCollapsed, setIsConsoleCollapsed] = useState(false)
@@ -46,41 +47,19 @@ export default function Page() {
       }
 
       if (e.key === "ArrowUp") {
-        consoleHistoryIndex.current = Math.max(consoleHistoryIndex.current - 1, 0)
-        console.log(consoleHistoryIndex.current)
-        if (consoleHistoryIndex.current < consoleHistory.length) {
-          setConsoleInput(consoleHistory[consoleHistoryIndex.current])
-        } else {
-          setConsoleInput("")
-        }
-
+        setConsoleHistoryIndex((prev) => Math.max(prev - 1, 0))
         return
       }
 
       if (e.key === "ArrowDown") {
-        consoleHistoryIndex.current = Math.min(
-          consoleHistoryIndex.current + 1,
-          consoleHistory.length
-        )
-        if (consoleHistoryIndex.current < consoleHistory.length) {
-          setConsoleInput(consoleHistory[consoleHistoryIndex.current])
-        } else {
-          setConsoleInput("")
-        }
+        setConsoleHistoryIndex((prev) => Math.min(prev + 1, consoleHistory.length - 1))
         return
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [
-    isConsoleCollapsed,
-    consoleHistory,
-    consoleInput,
-    consoleHistoryIndex,
-    setConsoleInput,
-    setIsConsoleCollapsed,
-  ])
+  }, [isConsoleCollapsed, consoleHistory, consoleHistoryIndex, setIsConsoleCollapsed])
 
   useEffect(() => {
     console.log(consoleHistory)
@@ -95,20 +74,25 @@ export default function Page() {
     e.preventDefault()
 
     await handleConsoleCommands(
-      consoleInput,
+      consoleHistory[consoleHistoryIndex],
       currentPrompt,
       setConsoleOutput,
       () => editorView?.state.doc.toString() ?? "",
       () => {
         setConsoleHistory((prev) => {
-          consoleHistoryIndex.current = prev.length + 1
-          return [...prev, consoleInput]
+          let newHistory: string[]
+          if (prev.length >= CONSOLE_HISTORY_SIZE) {
+            newHistory = [...prev.slice(1), ""]
+          } else {
+            newHistory = [...prev, ""]
+          }
+          setConsoleHistoryIndex(newHistory.length - 1)
+          return newHistory
         })
       }
     )
 
     setCurrentPrompt(getConsolePrompt())
-    setConsoleInput("")
   }
 
   const handleOnScriptLoad = () => {
@@ -202,8 +186,13 @@ for nums, target in testCases:
                   <input
                     type="text"
                     ref={consoleInputRef}
-                    value={consoleInput}
-                    onChange={(e) => setConsoleInput(e.target.value)}
+                    value={consoleHistory[consoleHistoryIndex]}
+                    onChange={(e) => {
+                      setConsoleHistory((prev) => {
+                        prev[consoleHistoryIndex] = e.target.value
+                        return [...prev]
+                      })
+                    }}
                     className="flex-1 bg-transparent outline-none"
                     autoFocus
                   />

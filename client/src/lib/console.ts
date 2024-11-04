@@ -1,7 +1,6 @@
 import { ExecuteCodeResponse } from "./schema"
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
-const CONSOLE_HISTORY_SIZE = 100
 
 export async function handleConsoleCommands(
   command: string,
