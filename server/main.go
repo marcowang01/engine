@@ -119,9 +119,9 @@ func main() {
 	address := fmt.Sprintf(":%s", port)
 	fmt.Printf("starting server on port %s (%s)\n", port, env)
 
-	// if output, err := pullPythonImage(); err != nil {
-	// 	log.Fatalf("failed to pull python image: %s\n%s", err, output)
-	// }
+	if output, err := pullPythonImage(); err != nil {
+		log.Fatalf("failed to pull python image: %s\n%s", err, output)
+	}
 
 	setupRoutes()
 	log.Fatal(http.ListenAndServe(address, nil))
