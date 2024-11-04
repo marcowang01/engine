@@ -47,11 +47,13 @@ export default function Page() {
       }
 
       if (e.key === "ArrowUp") {
+        e.preventDefault()
         setConsoleHistoryIndex((prev) => Math.max(prev - 1, 0))
         return
       }
 
       if (e.key === "ArrowDown") {
+        e.preventDefault()
         setConsoleHistoryIndex((prev) => Math.min(prev + 1, consoleHistory.length - 1))
         return
       }
@@ -62,8 +64,14 @@ export default function Page() {
   }, [isConsoleCollapsed, consoleHistory, consoleHistoryIndex, setIsConsoleCollapsed])
 
   useEffect(() => {
-    console.log(consoleHistory)
-  }, [consoleHistory])
+    if (consoleInputRef.current) {
+      const input = consoleInputRef.current
+      input.focus()
+      input.selectionStart = input.selectionEnd = input.value.length
+
+    }
+  }, [consoleHistoryIndex])
+
   useEffect(() => {
     if (consoleInputParentRef.current) {
       consoleInputParentRef.current.scrollTop = consoleInputParentRef.current.scrollHeight
