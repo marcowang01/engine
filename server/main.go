@@ -86,7 +86,11 @@ func setupRoutes() {
 
 func pullPythonImage() (string, error) {
 	fmt.Printf("pulling python image: %s\n", pythonImage)
-	cmd := exec.Command("docker", "pull", pythonImage)
+	cmd := exec.Command(
+		"docker", "pull",
+		pythonImage,
+	)
+
 	output, err := cmd.CombinedOutput()
 	fmt.Printf(" %s\ndone pulling python image\n", string(output))
 	return string(output), err
@@ -115,10 +119,9 @@ func main() {
 	address := fmt.Sprintf(":%s", port)
 	fmt.Printf("starting server on port %s (%s)\n", port, env)
 
-	// TODO: figure out how this works if it is async
-	if output, err := pullPythonImage(); err != nil {
-		log.Fatalf("failed to pull python image: %s\n%s", err, output)
-	}
+	// if output, err := pullPythonImage(); err != nil {
+	// 	log.Fatalf("failed to pull python image: %s\n%s", err, output)
+	// }
 
 	setupRoutes()
 	log.Fatal(http.ListenAndServe(address, nil))

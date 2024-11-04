@@ -5,7 +5,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+      - "2376:2376"
     env_file:
       - .env.docker
     # TODO: eventually find a way around this
     privileged: true
+    image: go-server:latest
+    container_name: go-server
+    

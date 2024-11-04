@@ -19,3 +19,9 @@ Thumbs.db
 # Environment
 .env
 .env.docker
+
+# Certificates
+certificates/*.pem
+certificates/*.csr
+certificates/*.srl
+certificates/*.key
