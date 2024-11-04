@@ -171,8 +171,8 @@ for nums, target in testCases:
     <div className="flex h-screen flex-col bg-[#1E1E1E] text-white">
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup direction="vertical" className="h-full">
-          <ResizablePanel defaultSize={60} className="m-4 mb-1 rounded-xl border border-blue-400">
-            <div className="flex h-full flex-col">
+          <ResizablePanel defaultSize={60} className="m-4 mb-1 rounded-xl border-0">
+            <div className="flex h-full flex-col bg-[#465a78]">
               <div className="flex h-[40px] items-center border-b border-gray-800 pl-2">
                 <div className="flex items-center gap-2">
                   <Code2 className="h-4 w-4" />
@@ -186,11 +186,11 @@ for nums, target in testCases:
           <ResizablePanel
             ref={consolePanelRef}
             defaultSize={40}
-            className="m-4 mt-1 cursor-text rounded-xl border border-gray-600"
+            className="m-4 mt-1 cursor-text rounded-xl border-0"
             onClick={handleOnConsoleCardClick}
             collapsible={true}
           >
-            <div className="flex h-[40px] items-center border-b border-gray-800 pl-2">
+            <div className="flex h-[40px] items-center border-b border-gray-800 bg-[#363636] pl-2">
               <div className="flex items-center gap-2">
                 <Terminal className="h-4 w-4" />
                 <span>console</span>
