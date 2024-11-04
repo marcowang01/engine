@@ -39,7 +39,7 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	start := time.Now()
-	output, err := runPythonDockerContainer(request.Code)
+	output, err := executePythonCode(request.Code)
 	if err != nil {
 		log.Printf("Error executing code: %v", err)
 		http.Error(w, fmt.Sprintf("Execution error: %v", err), http.StatusInternalServerError)
@@ -59,7 +59,15 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func runPythonDockerContainer(code string) (string, error) {
+func executePythonCode(code string) (string, error) {
+	if enableLocalExecution := os.Getenv("ENABLE_LOCAL_CODE_EXECUTION"); enableLocalExecution == "true" {
+		return executePythonCodeLocally(code)
+	}
+
+	return executePythonCodeInContainer(code)
+}
+
+func executePythonCodeInContainer(code string) (string, error) {
 	encodedCode := base64.StdEncoding.EncodeToString([]byte(code))
 	command := fmt.Sprintf("sh -c 'echo \"%s\" | base64 -d > program.py && python3 program.py'", encodedCode)
 
@@ -78,7 +86,7 @@ func runPythonDockerContainer(code string) (string, error) {
 	return string(output), nil
 }
 
-func executePythonCode(code string) (string, error) {
+func executePythonCodeLocally(code string) (string, error) {
 	cmd := exec.Command("python3", "-c", code)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
