@@ -14,6 +14,7 @@ import (
 )
 
 const pythonImage = "python:3.13.0-alpine3.19"
+const goImage = "golang:1.22.8-alpine3.19"
 
 func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 	var request ExecuteCodeRequest
@@ -32,20 +33,33 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Received execution request for language: %s", request.Language)
 
-	if request.Language != "python" {
+	start := time.Now()
+
+	var (
+		output string
+		err    error
+	)
+
+	switch request.Language {
+	case Python:
+		output, err = executePythonCode(request.Code)
+		if err != nil {
+			log.Printf("Error executing Python code: %v", err)
+			http.Error(w, fmt.Sprintf("Execution error: %v", err), http.StatusInternalServerError)
+			return
+		}
+	case Go:
+		output, err = executeGoCode(request.Code)
+		if err != nil {
+			log.Printf("Error executing Go code: %v", err)
+			http.Error(w, fmt.Sprintf("Execution error: %v", err), http.StatusInternalServerError)
+			return
+		}
+	default:
 		log.Printf("Unsupported language requested: %s", request.Language)
 		http.Error(w, "Unsupported language", http.StatusBadRequest)
 		return
 	}
-
-	start := time.Now()
-	output, err := executePythonCode(request.Code)
-	if err != nil {
-		log.Printf("Error executing code: %v", err)
-		http.Error(w, fmt.Sprintf("Execution error: %v", err), http.StatusInternalServerError)
-		return
-	}
-
 	response := ExecuteCodeResponse{
 		Output:      output,
 		TimeElapsed: int(time.Since(start).Milliseconds()),
@@ -59,6 +73,44 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/**
+ * Go code execution
+ */
+
+func executeGoCode(code string) (string, error) {
+	if enableLocalExecution := os.Getenv("ENABLE_LOCAL_CODE_EXECUTION"); enableLocalExecution == "true" {
+		return executeGoCodeLocally(code)
+	}
+
+	return executeGoCodeInContainer(code)
+}
+
+func executeGoCodeInContainer(code string) (string, error) {
+	cmd := exec.Command("docker", "run", "--env-file", ".env.docker", "--rm", goImage, "sh", "-c", code)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("Docker execution error: %v, Output: %s", err, output)
+		return "", err
+	}
+
+	log.Printf("Code executed successfully in Docker container")
+	return string(output), nil
+}
+
+func executeGoCodeLocally(code string) (string, error) {
+	cmd := exec.Command("go", "run", "-exec", "sh", "-c", code)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("Go execution error: %v, Output: %s", err, output)
+		return "", err
+	}
+	return string(output), nil
+}
+
+/**
+ * Python code execution
+ */
 func executePythonCode(code string) (string, error) {
 	if enableLocalExecution := os.Getenv("ENABLE_LOCAL_CODE_EXECUTION"); enableLocalExecution == "true" {
 		return executePythonCodeLocally(code)
