@@ -3,6 +3,13 @@
 import { Card } from "@/components/ui/card"
 // import MyEditor from "@/components/ui/react-editor"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { handleConsoleCommands } from "@/lib/console"
 import { EditorView } from "codemirror"
 import { Code2, Terminal } from "lucide-react"
@@ -176,7 +183,21 @@ for nums, target in testCases:
               <div className="flex h-[40px] items-center border-b border-gray-800 pl-2">
                 <div className="flex items-center gap-2">
                   <Code2 className="h-4 w-4" />
-                  <span>code</span>
+                  <span>
+                    <Select>
+                      <SelectTrigger className="font-sm h-[25px] w-[120px] border-none bg-[#5f6f8c] font-mono transition hover:bg-opacity-70 focus:border-none focus:ring-0">
+                        <SelectValue placeholder="python" />
+                      </SelectTrigger>
+                      <SelectContent className="border-none bg-transparent font-mono text-white backdrop-blur-sm">
+                        <SelectItem className="hover:bg-[#5f6f8c]" value="python">
+                          python
+                        </SelectItem>
+                        <SelectItem className="hover:bg-[#5f6f8c]" value="go">
+                          go
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </span>
                 </div>
               </div>
               <div id="editor-parent" ref={editorParentRef} className="h-[calc(100%-40px)]" />
