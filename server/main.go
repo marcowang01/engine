@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -45,14 +46,14 @@ func handleExecuteCode(w http.ResponseWriter, r *http.Request) {
 		output, err = executePythonCode(request.Code)
 		if err != nil {
 			log.Printf("Error executing Python code: %v", err)
-			http.Error(w, fmt.Sprintf("Execution error: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Execution error: %v %s. Finished in %dms", err, output, time.Since(start).Milliseconds()), http.StatusInternalServerError)
 			return
 		}
 	case Go:
 		output, err = executeGoCode(request.Code)
 		if err != nil {
 			log.Printf("Error executing Go code: %v", err)
-			http.Error(w, fmt.Sprintf("Execution error: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Execution error: %v %s. Finished in %dms", err, output, time.Since(start).Milliseconds()), http.StatusInternalServerError)
 			return
 		}
 	default:
@@ -86,25 +87,60 @@ func executeGoCode(code string) (string, error) {
 }
 
 func executeGoCodeInContainer(code string) (string, error) {
-	cmd := exec.Command("docker", "run", "--env-file", ".env.docker", "--rm", goImage, "sh", "-c", code)
+	encodedCode := base64.StdEncoding.EncodeToString([]byte(code))
+	command := fmt.Sprintf("sh -c 'echo \"%s\" | base64 -d > program.go && go run program.go'", encodedCode)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx,
+		"docker", "run", "--rm",
+		"--env-file", ".env.docker",
+		// "--cpus", "1", "--memory", "256m",
+		// "--network", "none",
+		// "--pids-limit", "100",
+		// "--security-opt", "no-new-privileges",
+		goImage,
+		"sh", "-c", command,
+	)
 
 	output, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Printf("Docker execution error: %v, Output: %s", err, output)
-		return "", err
+
+	if ctx.Err() == context.DeadlineExceeded {
+		log.Printf("Docker execution timed out")
+		return "", fmt.Errorf("execution timed out")
 	}
 
-	log.Printf("Code executed successfully in Docker container")
+	if err != nil {
+		log.Printf("Docker execution error: %v, Output: %s", err, output)
+		return string(output), err
+	}
+
+	log.Printf("Go code executed successfully in Docker container")
 	return string(output), nil
 }
 
 func executeGoCodeLocally(code string) (string, error) {
-	cmd := exec.Command("go", "run", "-exec", "sh", "-c", code)
+	encodedCode := base64.StdEncoding.EncodeToString([]byte(code))
+	command := fmt.Sprintf("sh -c 'echo \"%s\" | base64 -d > program.go && go run program.go && rm program.go'", encodedCode)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "sh", "-c", command)
 	output, err := cmd.CombinedOutput()
+
+	if ctx.Err() == context.DeadlineExceeded {
+		log.Printf("Go execution timed out")
+		return "", fmt.Errorf("execution timed out")
+	}
+
 	if err != nil {
 		log.Printf("Go execution error: %v, Output: %s", err, output)
-		return "", err
+		return string(output), err
 	}
+
+	log.Printf("Go code executed successfully using local Go")
 	return string(output), nil
 }
 
@@ -134,7 +170,7 @@ func executePythonCodeInContainer(code string) (string, error) {
 		return "", err
 	}
 
-	log.Printf("Code executed successfully in Docker container")
+	log.Printf("Python code executed successfully in Docker container")
 	return string(output), nil
 }
 
@@ -146,12 +182,26 @@ func executePythonCodeLocally(code string) (string, error) {
 		return "", err
 	}
 
-	log.Printf("Code executed successfully using local Python")
+	log.Printf("Python code executed successfully using local Python")
 	return string(output), nil
 }
 
 func setupRoutes() {
 	http.HandleFunc("/execute-code", handleExecuteCode)
+}
+
+func pullGoImage() error {
+	log.Printf("Pulling Go image: %s", goImage)
+	cmd := exec.Command("docker", "pull", goImage)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("Error pulling Go image: %v, Output: %s", err, output)
+		return err
+	}
+
+	log.Printf("Go image pulled successfully")
+	return nil
 }
 
 func pullPythonImage() error {
@@ -191,8 +241,14 @@ func main() {
 	address := fmt.Sprintf(":%s", port)
 	log.Printf("Starting server on port %s (%s environment)", port, env)
 
-	if err := pullPythonImage(); err != nil {
-		log.Fatalf("Failed to pull Python image: %v", err)
+	if enableLocalExecution := os.Getenv("ENABLE_LOCAL_CODE_EXECUTION"); enableLocalExecution == "false" {
+		if err := pullGoImage(); err != nil {
+			log.Fatalf("Failed to pull Go image: %v", err)
+		}
+
+		if err := pullPythonImage(); err != nil {
+			log.Fatalf("Failed to pull Python image: %v", err)
+		}
 	}
 
 	setupRoutes()
