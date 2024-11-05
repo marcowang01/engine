@@ -14,9 +14,10 @@ Rolling my own leetcode cuz I'm tired of doing actual leetcode problems.
   - [X] should fill code editor
   - [X] should fill console
   - [X] on click focus, scrolling to view
-- [ ] Add language support
+- [X] Add language support for Go
 - [X] Show latency
 - [X] Containerize
+- [ ] Do some writing to document goals and timelines and architecture choices
 
 ### This week
 - [ ] Add problems
