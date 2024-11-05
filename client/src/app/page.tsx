@@ -10,12 +10,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { getInitialProgram } from "@/lib/code-templates"
 import { handleConsoleCommands } from "@/lib/console"
 import { EditorView } from "codemirror"
 import { Code2, Terminal } from "lucide-react"
 import Script from "next/script"
 import { useEffect, useRef, useState } from "react"
 import * as ResizablePrimitive from "react-resizable-panels"
+import { EditorOptions, SupportLanguage } from "../../editor/editor"
+// import { EditorOptions } from "../../editor/editor"
 
 const CONSOLE_HISTORY_SIZE = 20
 
@@ -32,6 +35,7 @@ export default function Page() {
     },
   ])
   const [consoleHistoryIndex, setConsoleHistoryIndex] = useState(0)
+  const [language, setLanguage] = useState<SupportLanguage>(SupportLanguage.Python)
 
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
   const [editorView, setEditorView] = useState<EditorView | null>(null)
@@ -136,28 +140,28 @@ export default function Page() {
     ) {
       console.log("createEditorState and createEditorView are available")
 
-      const initialPythonProgram = `from typing import List
-
-class Solution:
-    def twoSum(self, nums: List[int], target: int) -> List[int]:
-        return [0, 1]
-
-testCases = [
-    ([2, 7, 11, 15], 9),
-    ([3, 2, 4], 6),
-    ([3, 3], 6),
-]
-
-for nums, target in testCases:
-    if Solution().twoSum(nums, target) == [0, 1]:
-        print("Pass")
-    else:
-        print("Fail")
-`
-      const initialState = window.createEditorState(initialPythonProgram, { oneDark: true })
+      const initialState = window.createEditorState(getInitialProgram(), { oneDark: true })
       const editorView = window.createEditorView(initialState, editorParentRef.current)
       setEditorView(editorView)
     }
+  }
+
+  const handleOnLanguageChange = (language: SupportLanguage) => {
+    if (
+      typeof window.createEditorState !== "function" ||
+      typeof window.createEditorView !== "function" ||
+      !editorParentRef.current
+    ) {
+      return
+    }
+
+    const options: EditorOptions = {
+      oneDark: true,
+      language,
+    }
+
+    const newState = window.createEditorState(getInitialProgram(language), options)
+    editorView?.setState(newState)
   }
 
   const handleOnConsoleCardClick = () => {
@@ -184,17 +188,18 @@ for nums, target in testCases:
                 <div className="flex items-center gap-2">
                   <Code2 className="h-4 w-4" />
                   <span>
-                    <Select>
+                    <Select
+                      value={language}
+                      onValueChange={(value) => {
+                        setLanguage(value as SupportLanguage)
+                      }}
+                    >
                       <SelectTrigger className="font-sm h-[25px] w-[120px] border-none bg-[#5f6f8c] font-mono transition hover:bg-opacity-70 focus:border-none focus:ring-0">
-                        <SelectValue placeholder="python" />
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="border-none bg-transparent font-mono text-white backdrop-blur-sm">
-                        <SelectItem className="hover:bg-[#5f6f8c]" value="python">
-                          python
-                        </SelectItem>
-                        <SelectItem className="hover:bg-[#5f6f8c]" value="go">
-                          go
-                        </SelectItem>
+                        <SelectItem value={SupportLanguage.Python}>python</SelectItem>
+                        <SelectItem value={SupportLanguage.Go}>go</SelectItem>
                       </SelectContent>
                     </Select>
                   </span>

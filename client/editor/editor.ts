@@ -39,7 +39,12 @@ import { python } from "@codemirror/lang-python"
 
 export interface EditorOptions {
   oneDark?: boolean
-  language?: "python" | "go"
+  language?: SupportLanguage
+}
+
+export enum SupportLanguage {
+  Python = "python",
+  Go = "go",
 }
 
 /*
@@ -49,10 +54,10 @@ export interface EditorOptions {
 function createEditorState(initialContent: string, options: EditorOptions = {}) {
   let languageSupport: LanguageSupport
   switch (options.language) {
-    case "python":
+    case SupportLanguage.Python:
       languageSupport = python()
       break
-    case "go":
+    case SupportLanguage.Go:
       languageSupport = go()
       break
     default:
