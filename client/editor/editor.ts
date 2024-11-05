@@ -14,6 +14,7 @@ import {
   foldKeymap,
   indentOnInput,
   indentUnit,
+  LanguageSupport,
   syntaxHighlighting,
 } from "@codemirror/language"
 import { highlightSelectionMatches } from "@codemirror/search"
@@ -33,10 +34,12 @@ import {
 import { oneDark } from "@codemirror/theme-one-dark"
 
 // Language
+import { go } from "@codemirror/lang-go"
 import { python } from "@codemirror/lang-python"
 
 export interface EditorOptions {
   oneDark?: boolean
+  language?: "python" | "go"
 }
 
 /*
@@ -44,6 +47,19 @@ export interface EditorOptions {
  */
 
 function createEditorState(initialContent: string, options: EditorOptions = {}) {
+  let languageSupport: LanguageSupport
+  switch (options.language) {
+    case "python":
+      languageSupport = python()
+      break
+    case "go":
+      languageSupport = go()
+      break
+    default:
+      languageSupport = python()
+      break
+  }
+
   const extensions = [
     lineNumbers(),
     highlightActiveLineGutter(),
@@ -70,7 +86,7 @@ function createEditorState(initialContent: string, options: EditorOptions = {}) 
       ...completionKeymap,
     ]),
     syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-    python(),
+    languageSupport,
   ]
 
   if (options.oneDark) {
