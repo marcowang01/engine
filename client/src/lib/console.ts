@@ -1,3 +1,4 @@
+import { SupportedLanguage } from "../../editor/editor"
 import { ExecuteCodeResponse } from "./schema"
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
@@ -5,6 +6,7 @@ const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL
 export async function handleConsoleCommands(
   command: string,
   currentPrompt: string,
+  language: SupportedLanguage,
   setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
   getCurrentCodeFromEditor: () => string,
   onSubmitNewCommand: () => void
@@ -27,7 +29,7 @@ export async function handleConsoleCommands(
       try {
         response = await fetch(`${SERVER_URL}/execute-code`, {
           method: "POST",
-          body: JSON.stringify({ code: currentCode, language: "python" }),
+          body: JSON.stringify({ code: currentCode, language }),
         })
       } catch (error) {
         setConsoleOutput((prev) => [

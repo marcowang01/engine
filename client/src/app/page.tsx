@@ -17,7 +17,7 @@ import { Code2, Terminal } from "lucide-react"
 import Script from "next/script"
 import { useEffect, useRef, useState } from "react"
 import * as ResizablePrimitive from "react-resizable-panels"
-import { EditorOptions, SupportLanguage } from "../../editor/editor"
+import { EditorOptions, SupportedLanguage } from "../../editor/editor"
 // import { EditorOptions } from "../../editor/editor"
 
 const CONSOLE_HISTORY_SIZE = 20
@@ -35,7 +35,7 @@ export default function Page() {
     },
   ])
   const [consoleHistoryIndex, setConsoleHistoryIndex] = useState(0)
-  const [language, setLanguage] = useState<SupportLanguage>(SupportLanguage.Python)
+  const [language, setLanguage] = useState<SupportedLanguage>(SupportedLanguage.Python)
 
   const [consoleOutput, setConsoleOutput] = useState<string[]>([])
   const [editorView, setEditorView] = useState<EditorView | null>(null)
@@ -108,6 +108,7 @@ export default function Page() {
     await handleConsoleCommands(
       command,
       currentPrompt,
+      language,
       setConsoleOutput,
       () => editorView?.state.doc.toString() ?? "",
       () => {
@@ -150,7 +151,7 @@ export default function Page() {
     }
   }
 
-  const handleOnLanguageChange = (language: SupportLanguage) => {
+  const handleOnLanguageChange = (language: SupportedLanguage) => {
     if (
       typeof window.createEditorState !== "function" ||
       typeof window.createEditorView !== "function" ||
@@ -201,15 +202,15 @@ export default function Page() {
                     <Select
                       value={language}
                       onValueChange={(value) => {
-                        setLanguage(value as SupportLanguage)
+                        setLanguage(value as SupportedLanguage)
                       }}
                     >
                       <SelectTrigger className="font-sm h-[25px] w-[120px] border-none bg-[#5f6f8c] font-mono transition hover:bg-opacity-70 focus:border-none focus:ring-0">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="border-none bg-transparent font-mono text-white backdrop-blur-sm">
-                        <SelectItem value={SupportLanguage.Python}>python</SelectItem>
-                        <SelectItem value={SupportLanguage.Go}>go</SelectItem>
+                        <SelectItem value={SupportedLanguage.Python}>python</SelectItem>
+                        <SelectItem value={SupportedLanguage.Go}>go</SelectItem>
                       </SelectContent>
                     </Select>
                   </span>

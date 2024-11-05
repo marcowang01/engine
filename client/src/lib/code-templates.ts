@@ -24,23 +24,6 @@ import "fmt"
 func main() {
 	fmt.Println("Hello, World!")
 }
-
-func Solution() int {
-	return 0
-}
-
-testCases := [
-  {
-    input: 0,
-    expected: 0,
-  },
-]
-
-for _, testCase := range testCases {
-  if Solution(testCase.input) != testCase.expected {
-    fmt.Println("Fail")
-  }
-}
 `
 
 export const getInitialProgram = (language?: string) => {
