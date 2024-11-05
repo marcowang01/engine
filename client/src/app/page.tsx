@@ -96,6 +96,10 @@ export default function Page() {
     }
   }, [consoleOutput])
 
+  useEffect(() => {
+    handleOnLanguageChange(language)
+  }, [language])
+
   const handleConsoleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -161,7 +165,13 @@ export default function Page() {
     }
 
     const newState = window.createEditorState(getInitialProgram(language), options)
-    editorView?.setState(newState)
+    setEditorView((prev) => {
+      if (prev) {
+        prev.setState(newState)
+        return prev
+      }
+      return null
+    })
   }
 
   const handleOnConsoleCardClick = () => {
