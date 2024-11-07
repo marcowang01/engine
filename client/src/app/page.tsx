@@ -230,7 +230,7 @@ export default function Page() {
             <div className="flex h-[40px] items-center border-b border-gray-800 bg-[#363636] pl-2">
               <div className="flex items-center gap-2">
                 <Terminal className="h-4 w-4" />
-                <span>console</span>
+                <span>terminal</span>
               </div>
             </div>
             <Card className="h-[calc(100%-40px)] rounded-none border-0 border-t border-none bg-[#272728] text-white">
