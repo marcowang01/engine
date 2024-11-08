@@ -248,7 +248,7 @@ export default function Page() {
                   className="m-2 mr-1 rounded-xl bg-[#1B1D23aa]"
                 >
                   <div className="relative h-full overflow-y-auto p-2">
-                    <div className="font-sm absolute right-1 top-2 flex items-center gap-2 rounded-sm border-none bg-[#5f6f8c33] px-2 py-1 text-xs text-gray-300">
+                    <div className="font-sm absolute right-2 top-2 flex items-center gap-2 rounded-sm border-none bg-[#5f6f8c33] px-2 py-1 text-xs text-gray-300">
                       <CommandIcon className="h-3 w-3" />
                       {"b"}
                     </div>
