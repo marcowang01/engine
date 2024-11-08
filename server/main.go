@@ -164,9 +164,18 @@ func executePythonCodeInContainer(code string) (string, error) {
 		"sh", "-c", command,
 	)
 
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
 	output, err := cmd.CombinedOutput()
+
+	if ctx.Err() == context.DeadlineExceeded {
+		log.Printf("Docker Python execution timed out")
+		return "", fmt.Errorf("execution timed out")
+	}
+
 	if err != nil {
-		log.Printf("Docker execution error: %v, Output: %s", err, output)
+		log.Printf("Docker Python execution error: %v, Output: %s", err, output)
 		return "", err
 	}
 
@@ -175,8 +184,17 @@ func executePythonCodeInContainer(code string) (string, error) {
 }
 
 func executePythonCodeLocally(code string) (string, error) {
-	cmd := exec.Command("python3", "-c", code)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "python3", "-c", code)
 	output, err := cmd.CombinedOutput()
+
+	if ctx.Err() == context.DeadlineExceeded {
+		log.Printf("Python execution timed out")
+		return "", fmt.Errorf("execution timed out")
+	}
+
 	if err != nil {
 		log.Printf("Python execution error: %v, Output: %s", err, output)
 		return "", err
