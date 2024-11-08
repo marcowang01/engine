@@ -1,4 +1,4 @@
-# Leet Code Reimagined
+# Engine
 Rolling my own leetcode cuz I'm tired of doing actual leetcode problems.
 
 ## Feature
