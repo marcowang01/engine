@@ -1,11 +1,11 @@
 "use client"
 
 import { GetProblemRequest, GetProblemResponse } from "@/lib/schema"
-import { marked } from "marked"
 import DOMPurify from "dompurify"
+import { marked } from "marked"
 import { useEffect, useMemo, useState } from "react"
 
-export default function ProblemMarkdown({ problemId }: { problemId: string }) {
+export default function ProblemMarkdownPanel({ problemId }: { problemId: string }) {
   const [problem, setProblem] = useState("")
 
   useEffect(() => {
@@ -23,11 +23,12 @@ export default function ProblemMarkdown({ problemId }: { problemId: string }) {
       return "no problem found"
     }
 
-    const dirtyHtml = marked.parse(
-      problem.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, "")
-    ) as string
+    const renderer = new marked.Renderer()
+    const dirtyHtml = marked.parse(problem.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, ""), {
+      renderer,
+    }) as string
     return DOMPurify.sanitize(dirtyHtml)
   }, [problem])
 
-  return <div dangerouslySetInnerHTML={{ __html: cleanHtml }} />
+  return <div className="markdown px-2" dangerouslySetInnerHTML={{ __html: cleanHtml }} />
 }

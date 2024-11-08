@@ -60,6 +60,17 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  ::-webkit-scrollbar {
+    opacity: 80%;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  * {
+    scrollbar-color: #888 transparent;
+}
+
 }
 
 @layer base {
@@ -69,4 +80,68 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.markdown h1 {
+  @apply text-4xl font-bold mb-4;
+}
+
+.markdown h2 {
+  @apply text-2xl font-bold my-4;
+}
+
+.markdown h3 {
+  @apply text-xl font-bold my-3;
+}
+
+.markdown h4 {
+  @apply text-lg font-bold my-3;
+}
+
+.markdown p {
+  @apply mb-4 text-sm;
+}
+
+.markdown ul {
+  @apply list-disc list-inside pl-4 mb-4;
+}
+
+.markdown ol {
+  @apply list-decimal list-inside;
+}
+
+.markdown blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic;
+}
+
+.markdown code {
+  @apply bg-gray-700 rounded-sm px-1 py-0.5 text-xs;
+}
+
+.markdown pre {
+  @apply bg-gray-100 rounded-md p-4;
+}
+
+.markdown a {
+  @apply text-blue-500;
+}
+
+.markdown img {
+  @apply max-w-full rounded-md;
+}
+
+.markdown em {
+  @apply italic;
+}
+
+.markdown strong {
+  @apply font-bold;
+}
+
+.markdown blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic;
+}
+
+.markdown hr {
+  @apply my-4;
 }

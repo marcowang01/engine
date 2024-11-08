@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/card"
 // import MyEditor from "@/components/ui/react-editor"
+import ProblemMarkdownPanel from "@/components/problem"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import {
   Select,
@@ -18,7 +19,6 @@ import Script from "next/script"
 import { useEffect, useRef, useState } from "react"
 import * as ResizablePrimitive from "react-resizable-panels"
 import { EditorOptions, SupportedLanguage } from "../../editor/editor"
-import ProblemMarkdown from "@/components/problem"
 
 const CONSOLE_HISTORY_SIZE = 20
 
@@ -198,7 +198,7 @@ export default function Page() {
           <ResizablePanel defaultSize={60} className="m-4 mb-1 rounded-xl">
             <div className="flex h-full flex-col bg-[#282C34]">
               <div className="flex h-[40px] items-center border-b border-gray-800 bg-[#465a78] pl-2">
-                <div className="flex items-center justify-between gap-2 w-full mx-2">
+                <div className="mx-2 flex w-full items-center justify-between gap-2">
                   <Code2 className="h-4 w-4" />
                   <Select
                     value={language}
@@ -219,7 +219,9 @@ export default function Page() {
 
               <ResizablePanelGroup direction="horizontal" className="h-full">
                 <ResizablePanel defaultSize={40} className="m-2 mr-1 rounded-xl bg-[#1B1D23aa] p-2">
-                  <ProblemMarkdown problemId={currentProblemId} />
+                  <div className="h-full overflow-y-auto">
+                    <ProblemMarkdownPanel problemId={currentProblemId} />
+                  </div>
                 </ResizablePanel>
                 <ResizableHandle className="m-0.5 bg-gray-600 p-0.5 opacity-0 transition-opacity" />
                 <ResizablePanel defaultSize={60} className="ml-1 rounded-xl border-0">
