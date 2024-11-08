@@ -7,3 +7,11 @@ export interface ExecuteCodeRequest {
   code: string
   language: string
 }
+
+export interface GetProblemRequest {
+  problemId: string
+}
+
+export interface GetProblemResponse {
+  markdownHtml: string
+}

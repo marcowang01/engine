@@ -119,5 +119,7 @@ declare global {
   }
 }
 
-window.createEditorState = createEditorState
-window.createEditorView = createEditorView
+if (typeof window !== "undefined") {
+  window.createEditorState = createEditorState
+  window.createEditorView = createEditorView
+}

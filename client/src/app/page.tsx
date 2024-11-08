@@ -18,7 +18,7 @@ import Script from "next/script"
 import { useEffect, useRef, useState } from "react"
 import * as ResizablePrimitive from "react-resizable-panels"
 import { EditorOptions, SupportedLanguage } from "../../editor/editor"
-// import { EditorOptions } from "../../editor/editor"
+import ProblemMarkdown from "@/components/problem"
 
 const CONSOLE_HISTORY_SIZE = 20
 
@@ -41,6 +41,8 @@ export default function Page() {
   const [editorView, setEditorView] = useState<EditorView | null>(null)
   const [isConsoleCollapsed, setIsConsoleCollapsed] = useState(false)
   const [currentPrompt, setCurrentPrompt] = useState("")
+
+  const [currentProblemId, setCurrentProblemId] = useState("123")
 
   const editorParentRef = useRef<HTMLDivElement>(null)
   const consoleInputRef = useRef<HTMLInputElement>(null)
@@ -217,7 +219,7 @@ export default function Page() {
 
               <ResizablePanelGroup direction="horizontal" className="h-full">
                 <ResizablePanel defaultSize={40} className="m-2 mr-1 rounded-xl bg-[#1B1D23aa] p-2">
-                  problem description
+                  <ProblemMarkdown problemId={currentProblemId} />
                 </ResizablePanel>
                 <ResizableHandle className="m-0.5 bg-gray-600 p-0.5 opacity-0 transition-opacity" />
                 <ResizablePanel defaultSize={60} className="ml-1 rounded-xl border-0">
