@@ -193,33 +193,40 @@ export default function Page() {
     <div className="flex h-screen flex-col bg-[#1E1E1E] text-white">
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup direction="vertical" className="h-full">
-          <ResizablePanel defaultSize={60} className="m-4 mb-1 rounded-xl border-0">
-            <div className="flex h-full flex-col bg-[#465a78]">
-              <div className="flex h-[40px] items-center border-b border-gray-800 pl-2">
-                <div className="flex items-center gap-2">
+          <ResizablePanel defaultSize={60} className="m-4 mb-1 rounded-xl">
+            <div className="flex h-full flex-col bg-[#282C34]">
+              <div className="flex h-[40px] items-center border-b border-gray-800 bg-[#465a78] pl-2">
+                <div className="flex items-center justify-between gap-2 w-full mx-2">
                   <Code2 className="h-4 w-4" />
-                  <span>
-                    <Select
-                      value={language}
-                      onValueChange={(value) => {
-                        setLanguage(value as SupportedLanguage)
-                      }}
-                    >
-                      <SelectTrigger className="font-sm h-[25px] w-[120px] border-none bg-[#5f6f8c] font-mono transition hover:bg-opacity-70 focus:border-none focus:ring-0">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="border-none bg-transparent font-mono text-white backdrop-blur-sm">
-                        <SelectItem value={SupportedLanguage.Python}>python</SelectItem>
-                        <SelectItem value={SupportedLanguage.Go}>go</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </span>
+                  <Select
+                    value={language}
+                    onValueChange={(value) => {
+                      setLanguage(value as SupportedLanguage)
+                    }}
+                  >
+                    <SelectTrigger className="font-sm h-[25px] w-[120px] border-none bg-[#5f6f8c] font-mono transition hover:bg-opacity-70 focus:border-none focus:ring-0">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="border-none bg-transparent font-mono text-white backdrop-blur-sm">
+                      <SelectItem value={SupportedLanguage.Python}>python</SelectItem>
+                      <SelectItem value={SupportedLanguage.Go}>go</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              <div id="editor-parent" ref={editorParentRef} className="h-[calc(100%-40px)]" />
+
+              <ResizablePanelGroup direction="horizontal" className="h-full">
+                <ResizablePanel defaultSize={40} className="m-2 mr-1 rounded-xl bg-[#1B1D23aa] p-2">
+                  problem description
+                </ResizablePanel>
+                <ResizableHandle className="m-0.5 bg-gray-600 p-0.5 opacity-0 transition-opacity" />
+                <ResizablePanel defaultSize={60} className="ml-1 rounded-xl border-0">
+                  <div id="editor-parent" ref={editorParentRef} className="h-[calc(100%-40px)]" />
+                </ResizablePanel>
+              </ResizablePanelGroup>
             </div>
           </ResizablePanel>
-          <ResizableHandle className="m-0.5 bg-gray-600 p-0.5 opacity-0 transition-opacity hover:opacity-100 active:opacity-100" />
+          <ResizableHandle className="m-0.5 bg-gray-600 p-0.5 opacity-0 transition-opacity" />
           <ResizablePanel
             ref={consolePanelRef}
             defaultSize={40}
