@@ -14,7 +14,7 @@ import {
 import { getInitialProgram } from "@/lib/code-templates"
 import { handleConsoleCommands } from "@/lib/console"
 import { EditorView } from "codemirror"
-import { Code2, Terminal } from "lucide-react"
+import { Code2, CommandIcon, Terminal } from "lucide-react"
 import Script from "next/script"
 import { useEffect, useRef, useState } from "react"
 import * as ResizablePrimitive from "react-resizable-panels"
@@ -43,11 +43,13 @@ export default function Page() {
   const [currentPrompt, setCurrentPrompt] = useState("")
 
   const [currentProblemId, setCurrentProblemId] = useState("123")
+  const [isProblemPanelCollapsed, setIsProblemPanelCollapsed] = useState(false)
 
   const editorParentRef = useRef<HTMLDivElement>(null)
   const consoleInputRef = useRef<HTMLInputElement>(null)
   const consoleInputParentRef = useRef<HTMLDivElement>(null)
   const consolePanelRef = useRef<ResizablePrimitive.ImperativePanelHandle>(null)
+  const problemPanelRef = useRef<ResizablePrimitive.ImperativePanelHandle>(null)
 
   useEffect(() => {
     setCurrentPrompt(getConsolePrompt())
@@ -67,6 +69,20 @@ export default function Page() {
         return
       }
 
+      if (e.key === "b" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault()
+        if (isProblemPanelCollapsed) {
+          console.log("expanding problem panel")
+          problemPanelRef.current?.expand()
+          setIsProblemPanelCollapsed(false)
+        } else {
+          console.log("collapsing problem panel")
+          problemPanelRef.current?.collapse()
+          setIsProblemPanelCollapsed(true)
+        }
+        return
+      }
+
       if (e.key === "ArrowUp") {
         e.preventDefault()
         setConsoleHistoryIndex((prev) => Math.max(prev - 1, 0))
@@ -82,7 +98,14 @@ export default function Page() {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isConsoleCollapsed, consoleHistory, consoleHistoryIndex, setIsConsoleCollapsed])
+  }, [
+    isConsoleCollapsed,
+    consoleHistory,
+    consoleHistoryIndex,
+    setIsConsoleCollapsed,
+    isProblemPanelCollapsed,
+    setIsProblemPanelCollapsed,
+  ])
 
   useEffect(() => {
     if (consoleInputRef.current) {
@@ -218,8 +241,17 @@ export default function Page() {
               </div>
 
               <ResizablePanelGroup direction="horizontal" className="h-full">
-                <ResizablePanel defaultSize={40} className="m-2 mr-1 rounded-xl bg-[#1B1D23aa] p-2">
-                  <div className="h-full overflow-y-auto">
+                <ResizablePanel
+                  ref={problemPanelRef}
+                  collapsible={true}
+                  defaultSize={40}
+                  className="m-2 mr-1 rounded-xl bg-[#1B1D23aa]"
+                >
+                  <div className="relative h-full overflow-y-auto p-2">
+                    <div className="font-sm absolute right-1 top-2 flex items-center gap-2 rounded-sm border-none bg-[#5f6f8c33] px-2 py-1 text-xs text-gray-300">
+                      <CommandIcon className="h-3 w-3" />
+                      {"b"}
+                    </div>
                     <ProblemMarkdownPanel problemId={currentProblemId} />
                   </div>
                 </ResizablePanel>
@@ -239,9 +271,15 @@ export default function Page() {
             collapsible={true}
           >
             <div className="flex h-[40px] items-center border-b border-gray-800 bg-[#363636] pl-2">
-              <div className="flex items-center gap-2">
-                <Terminal className="h-4 w-4" />
-                <span>terminal</span>
+              <div className="flex w-full items-center justify-between gap-2 pr-2">
+                <div className="flex items-center gap-1">
+                  <Terminal className="h-4 w-4" />
+                  <span>terminal</span>
+                </div>
+                <div className="font-sm flex items-center gap-2 rounded-sm border-none bg-[#5f6f8c33] px-2 py-1 text-xs text-gray-300">
+                  <CommandIcon className="h-3 w-3" />
+                  {"/"}
+                </div>
               </div>
             </div>
             <Card className="h-[calc(100%-40px)] rounded-none border-0 border-t border-none bg-[#272728] text-white">
