@@ -7,12 +7,14 @@ import { useEffect, useMemo, useState } from "react"
 
 export default function ProblemMarkdownPanel({ problemId }: { problemId: string }) {
   const [problem, setProblem] = useState("")
+  const [title, setTitle] = useState("")
 
   useEffect(() => {
     const fetchProblem = async (request: GetProblemRequest) => {
       const res = await fetch(`/api/get-problem?problemId=${request.problemId}`)
       const data = (await res.json()) as GetProblemResponse
       setProblem(data.markdownHtml)
+      setTitle(data.title)
     }
 
     void fetchProblem({ problemId })
@@ -30,5 +32,10 @@ export default function ProblemMarkdownPanel({ problemId }: { problemId: string 
     return DOMPurify.sanitize(dirtyHtml)
   }, [problem])
 
-  return <div className="markdown px-2" dangerouslySetInnerHTML={{ __html: cleanHtml }} />
+  return (
+    <div className="px-2 pt-2">
+      <h1 className="text-3xl font-bold">{title}</h1>
+      <div className="markdown" dangerouslySetInnerHTML={{ __html: cleanHtml }} />
+    </div>
+  )
 }

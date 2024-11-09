@@ -15,6 +15,7 @@ export interface GetProblemRequest {
 }
 
 export interface GetProblemResponse {
+  title: string
   markdownHtml: string
 }
 

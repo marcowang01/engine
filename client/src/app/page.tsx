@@ -42,7 +42,7 @@ export default function Page() {
   const [isConsoleCollapsed, setIsConsoleCollapsed] = useState(false)
   const [currentPrompt, setCurrentPrompt] = useState("")
 
-  const [currentProblemId, setCurrentProblemId] = useState("123")
+  const [currentProblemId, setCurrentProblemId] = useState("13a73ebb-c073-4acf-a7ec-beec91c4a162")
   const [isProblemPanelCollapsed, setIsProblemPanelCollapsed] = useState(false)
 
   const editorParentRef = useRef<HTMLDivElement>(null)
