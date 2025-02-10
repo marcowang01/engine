@@ -1,5 +1,6 @@
-# Engine
+# Engine (WIP)
 Rolling my own leetcode cuz I'm tired of doing actual leetcode problems.
+This project is being actively developed on.
 
 ![screenshot](./assets/021024.png)
 
