@@ -4,8 +4,9 @@ This project is being actively developed on.
 
 ![screenshot](./assets/021024.png)
 
+
 ## Goals
-- Easily deploy offline and practice via docker compose
+- Easily deploy offline and practice via containerized code execution enviornments
 - Duolingo style design
   - Streaks + Friend Streaks
   - Easy to select individual problems or a category of problems
